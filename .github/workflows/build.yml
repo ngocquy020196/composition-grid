@@ -1,8 +1,9 @@
-name: Build Extension
+name: Build & Release Extension
 
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
 
@@ -35,3 +36,15 @@ jobs:
           name: composition-grid-extension
           path: dist/
           retention-days: 30
+
+      - name: Package extension as zip
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: cd dist && zip -r ../composition-grid-${{ github.ref_name }}.zip .
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Composition Grid ${{ github.ref_name }}
+          generate_release_notes: true
+          files: composition-grid-${{ github.ref_name }}.zip
