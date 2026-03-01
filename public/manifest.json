@@ -1,0 +1,36 @@
+{
+    "manifest_version": 3,
+    "name": "Composition Grid: Rule of Thirds & Golden Ratio",
+    "version": "1.0.0",
+    "description": "By overlaying Rule of Thirds and Golden Ratio grids directly onto the frame, this tool allows photographers to scrutinize visual balance and rhythm with the utmost precision. Let the guiding lines direct your eye to strategic power points, helping you verify the compositional intent and structural accuracy of every masterpiece.",
+    "permissions": [
+        "storage"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "content.css"
+            ],
+            "run_at": "document_idle"
+        }
+    ]
+}

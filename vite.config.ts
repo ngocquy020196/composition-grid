@@ -1,0 +1,68 @@
+import { defineConfig, type PluginOption } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import { resolve } from 'path';
+import { copyFileSync, existsSync, writeFileSync } from 'fs';
+
+// Post-build plugin: copies content.css from source to dist
+function copyContentCss(): PluginOption {
+    return {
+        name: 'copy-content-css',
+        closeBundle() {
+            const src = resolve(__dirname, 'src/content/content.css');
+            const dest = resolve(__dirname, 'dist/content.css');
+            if (existsSync(src)) {
+                copyFileSync(src, dest);
+            }
+        },
+    };
+}
+
+export default defineConfig(({ mode }) => {
+    const isContentBuild = process.env.BUILD_TARGET === 'content';
+
+    if (isContentBuild) {
+        return {
+            plugins: [react(), copyContentCss()],
+            define: {
+                'process.env.NODE_ENV': JSON.stringify('production'),
+            },
+            build: {
+                outDir: 'dist',
+                emptyOutDir: false,
+                cssCodeSplit: false,
+                lib: {
+                    entry: resolve(__dirname, 'src/content/index.ts'),
+                    name: 'CompositionGrid',
+                    formats: ['iife'],
+                    fileName: () => 'content.js',
+                },
+                rollupOptions: {
+                    output: {
+                        globals: {},
+                    },
+                },
+            },
+        };
+    }
+
+    // Default: popup build
+    return {
+        plugins: [react(), tailwindcss()],
+        base: './', // Relative paths for Chrome Extension
+        build: {
+            outDir: 'dist',
+            emptyOutDir: true,
+            rollupOptions: {
+                input: {
+                    popup: resolve(__dirname, 'popup.html'),
+                },
+                output: {
+                    entryFileNames: '[name].js',
+                    chunkFileNames: '[name].js',
+                    assetFileNames: 'assets/[name][extname]',
+                },
+            },
+        },
+    };
+});
