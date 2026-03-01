@@ -66,8 +66,8 @@ const translations: Record<string, Record<Language, string>> = {
         vi: 'Tác Giả',
     },
     authorName: {
-        en: 'Nguyen Quy',
-        vi: 'Nguyễn Quý',
+        en: 'Quy Nguyen',
+        vi: 'Quy Nguyen',
     },
     authorWebsite: {
         en: 'https://ngocquy.dev',
