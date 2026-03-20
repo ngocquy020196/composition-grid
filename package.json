@@ -1,10 +1,10 @@
 {
   "name": "composition-grid-rule-of-thirds-golden-ratio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && BUILD_TARGET=content vite build",
+    "build": "vite build && BUILD_TARGET=content vite build && BUILD_TARGET=background vite build",
     "build:popup": "vite build",
     "build:content": "BUILD_TARGET=content vite build",
     "preview": "vite preview"

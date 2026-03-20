@@ -1,14 +1,5 @@
 @import "tailwindcss";
 
-/* ===== Base Reset ===== */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 :root {
   --bg-primary: #0f0f14;
   --bg-card: rgba(23, 23, 32, 0.85);
@@ -170,6 +161,45 @@ body {
   color: #fff;
 }
 
+/* ===== Grid Type Selector (2×2) ===== */
+.setting-row-grid {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.grid-type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  width: 100%;
+  background: var(--toggle-bg);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.grid-type-selector button {
+  padding: 7px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.grid-type-selector button:hover {
+  color: var(--text-primary);
+}
+
+.grid-type-selector button.seg-active {
+  background: var(--accent-gradient);
+  color: #fff;
+}
+
 /* ===== Color Picker ===== */
 .color-picker-wrapper {
   display: flex;
@@ -239,6 +269,40 @@ body {
   text-align: right;
 }
 
+/* ===== Shortcut Hint ===== */
+.setting-label-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcut-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0.6;
+}
+
+.shortcut-hint kbd {
+  display: inline-block;
+  padding: 0 5px;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.shortcut-plus {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
 /* ===== Divider ===== */
 .divider {
   height: 1px;
@@ -257,4 +321,15 @@ body {
   font-size: 10px;
   color: var(--text-secondary);
   opacity: 0.6;
+}
+
+.popup-footer a {
+  color: var(--accent-solid);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.popup-footer a:hover {
+  text-decoration: underline;
+  opacity: 0.8;
 }

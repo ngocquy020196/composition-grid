@@ -1,11 +1,15 @@
 {
     "manifest_version": 3,
-    "name": "Composition Grid: Rule of Thirds & Golden Ratio",
-    "version": "1.0.0",
-    "description": "A photography tool to master composition. Overlay Rule of Thirds and Golden Ratio grids on any website to analyze visual balance.",
+    "name": "Composition Grid: Rule of Thirds, Golden Ratio & More",
+    "version": "1.0.1",
+    "description": "Overlay composition grids on any image: Rule of Thirds, Golden Ratio, Fibonacci Spiral & Triangle guides.",
     "permissions": [
-        "storage"
+        "storage",
+        "contextMenus"
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
@@ -32,5 +36,14 @@
             ],
             "run_at": "document_idle"
         }
-    ]
+    ],
+    "commands": {
+        "toggle-grid": {
+            "suggested_key": {
+                "default": "Alt+G",
+                "mac": "Alt+G"
+            },
+            "description": "Toggle composition grid overlay"
+        }
+    }
 }

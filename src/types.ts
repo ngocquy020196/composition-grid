@@ -1,24 +1,27 @@
-export type GridType = 'thirds' | 'golden';
+export type GridType = 'thirds' | 'golden' | 'fibonacci' | 'triangle';
 export type Language = 'en' | 'vi';
+export type SpiralOrientation = 0 | 1 | 2 | 3;
 
 export interface Settings {
     enabled: boolean;
-    gridType: GridType;
+    gridTypes: GridType[];
     lineColor: string;
     dotColor: string;
     showDots: boolean;
     dotSize: number;
     lineSize: number;
     language: Language;
+    spiralOrientation: SpiralOrientation;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
     enabled: true,
-    gridType: 'thirds',
-    lineColor: '#000000',
+    gridTypes: ['thirds', 'triangle'],
+    lineColor: '#ffffff',
     dotColor: '#ffffff',
     showDots: true,
-    dotSize: 5,
+    dotSize: 8,
     lineSize: 1,
     language: 'en',
+    spiralOrientation: 0,
 };

@@ -1,17 +1,21 @@
 import { Language } from '../types';
 
-const translations: Record<string, Record<Language, string>> = {
+const translations = {
     appName: {
         en: 'Composition Grid',
         vi: 'Lưới Bố Cục',
     },
     appTagline: {
-        en: 'Rule of Thirds & Golden Ratio',
-        vi: 'Quy Tắc 1/3 & Tỷ Lệ Vàng',
+        en: 'Composition Guides for Every Shot',
+        vi: 'Hướng Dẫn Bố Cục Cho Mọi Bức Ảnh',
     },
     enableGrid: {
         en: 'Enable Grid',
         vi: 'Bật Lưới',
+    },
+    shortcutHint: {
+        en: 'to toggle quickly',
+        vi: 'bật/tắt nhanh',
     },
     gridType: {
         en: 'Grid Type',
@@ -28,6 +32,22 @@ const translations: Record<string, Record<Language, string>> = {
     golden: {
         en: 'Golden Ratio',
         vi: 'Tỷ Lệ Vàng',
+    },
+    fibonacci: {
+        en: 'Fibonacci Spiral',
+        vi: 'Xoắn Ốc Fibonacci',
+    },
+    triangle: {
+        en: 'Triangle',
+        vi: 'Tam Giác',
+    },
+    spiralOrientation: {
+        en: 'Spiral Direction',
+        vi: 'Hướng Xoắn Ốc',
+    },
+    toggleGrid: {
+        en: 'Toggle Composition Grid',
+        vi: 'Bật/Tắt Lưới Bố Cục',
     },
     lineColor: {
         en: 'Line Color',
@@ -77,8 +97,11 @@ const translations: Record<string, Record<Language, string>> = {
         en: 'contact@ngocquy.dev',
         vi: 'contact@ngocquy.dev',
     },
-};
+} as const satisfies Record<string, Record<Language, string>>;
 
-export function t(key: string, lang: Language): string {
-    return translations[key]?.[lang] ?? key;
+export type TranslationKey = keyof typeof translations;
+
+export function t(key: TranslationKey, lang: Language): string {
+    return translations[key][lang];
 }
+

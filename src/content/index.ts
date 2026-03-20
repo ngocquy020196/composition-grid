@@ -29,18 +29,33 @@ function renderOverlay(entry: InjectedEntry, settings: Settings) {
     entry.overlayDiv.style.display = '';
     entry.root.render(
         React.createElement(GridOverlay, {
-            gridType: settings.gridType,
+            gridTypes: settings.gridTypes,
             lineColor: settings.lineColor,
             dotColor: settings.dotColor,
             showDots: settings.showDots,
             dotSize: settings.dotSize,
             lineSize: settings.lineSize,
+            spiralOrientation: settings.spiralOrientation,
         })
     );
 }
 
 function renderAllOverlays() {
     injectedMap.forEach((entry) => renderOverlay(entry, currentSettings));
+}
+
+// ─── Cleanup Helper ──────────────────────────────────────────────────────────
+function cleanupImage(img: HTMLImageElement) {
+    const entry = injectedMap.get(img);
+    if (!entry) return;
+    try {
+        entry.root.unmount();
+        entry.overlayDiv.remove();
+        img.removeAttribute(ATTR);
+    } catch {
+        // Node may already be removed from DOM
+    }
+    injectedMap.delete(img);
 }
 
 // ─── Injection ───────────────────────────────────────────────────────────────
@@ -81,33 +96,6 @@ function injectGrid(img: HTMLImageElement) {
 
     injectedMap.set(img, entry);
     renderOverlay(entry, currentSettings);
-}
-
-function cleanupEntry(entry: InjectedEntry) {
-    try {
-        entry.root.unmount();
-        entry.overlayDiv.remove();
-        entry.img.removeAttribute(ATTR);
-        injectedMap.delete(entry.img);
-    } catch {
-        // Node may already be removed from DOM
-    }
-}
-
-// ─── Image Discovery ─────────────────────────────────────────────────────────
-function processImages(root: Element | Document = document) {
-    const images = root.querySelectorAll<HTMLImageElement>('img');
-    images.forEach((img) => {
-        if (img.complete && img.naturalWidth > 0) {
-            injectGrid(img);
-        } else {
-            img.addEventListener(
-                'load',
-                () => injectGrid(img),
-                { once: true, passive: true }
-            );
-        }
-    });
 }
 
 // ─── IntersectionObserver ────────────────────────────────────────────────────
@@ -153,29 +141,60 @@ const mutationObserver = new MutationObserver((mutations) => {
             if (node.nodeType !== Node.ELEMENT_NODE) continue;
             const el = node as Element;
 
-            // Check if this element contains injected images
-            const imgs = el.querySelectorAll<HTMLImageElement>(`img[${ATTR}]`);
-            imgs.forEach((img) => {
-                const entry = injectedMap.get(img);
-                if (entry) {
-                    try {
-                        entry.root.unmount();
-                    } catch { /* ignored */ }
-                    injectedMap.delete(img);
-                }
-            });
+            // Clean up injected images within the removed element
+            el.querySelectorAll<HTMLImageElement>(`img[${ATTR}]`)
+                .forEach(cleanupImage);
 
             // Check if the removed element itself is an injected image
             if (el.tagName === 'IMG' && el.getAttribute(ATTR) === 'true') {
-                const entry = injectedMap.get(el as HTMLImageElement);
-                if (entry) {
-                    try {
-                        entry.root.unmount();
-                    } catch { /* ignored */ }
-                    injectedMap.delete(el as HTMLImageElement);
-                }
+                cleanupImage(el as HTMLImageElement);
             }
         }
+    }
+});
+
+// ─── Context Menu Message Handler ────────────────────────────────────────────
+chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }) => {
+    // Keyboard shortcut: toggle all grids on the page
+    if (message.type === 'TOGGLE_GRID_ALL') {
+        currentSettings.enabled = !currentSettings.enabled;
+        chrome.storage.sync.set({ enabled: currentSettings.enabled });
+        renderAllOverlays();
+        return;
+    }
+
+    if (message.type !== 'TOGGLE_GRID' || !message.srcUrl) return;
+
+    // Find the image by its src URL
+    const images = document.querySelectorAll<HTMLImageElement>('img');
+    for (const img of images) {
+        if (img.src !== message.srcUrl && img.currentSrc !== message.srcUrl) continue;
+
+        const entry = injectedMap.get(img);
+
+        if (entry) {
+            // Already injected — check if it's visible or hidden
+            const isHidden = entry.overlayDiv.style.display === 'none';
+
+            if (isHidden) {
+                // Grid was injected but hidden (enabled=false) → enable and show
+                currentSettings.enabled = true;
+                chrome.storage.sync.set({ enabled: true });
+                renderAllOverlays();
+            } else {
+                // Grid is visible → remove it
+                cleanupImage(img);
+            }
+        } else {
+            // Not injected yet → enable and inject
+            if (!currentSettings.enabled) {
+                currentSettings.enabled = true;
+                chrome.storage.sync.set({ enabled: true });
+                renderAllOverlays();
+            }
+            injectGrid(img);
+        }
+        break;
     }
 });
 
@@ -203,3 +222,4 @@ async function init() {
 
 // Start
 init();
+

@@ -1,12 +1,12 @@
 # Privacy Policy
 
-**Composition Grid: Rule of Thirds & Golden Ratio**
+**Composition Grid: Rule of Thirds, Golden Ratio & More**
 
-*Last updated: March 1, 2026*
+*Last updated: March 20, 2026*
 
 ## Overview
 
-Composition Grid is a browser extension that overlays composition grids on images. We are committed to protecting your privacy.
+Composition Grid is a browser extension for Chrome and Microsoft Edge that overlays composition grids (Rule of Thirds, Golden Ratio, Fibonacci Spiral, and Golden Triangle) on images across the web. We are committed to protecting your privacy.
 
 ## Data Collection
 
@@ -14,7 +14,7 @@ Composition Grid is a browser extension that overlays composition grids on image
 
 This extension:
 
-- ✅ Stores your settings (grid type, colors, sizes) locally using Chrome's `storage.sync` API
+- ✅ Stores your settings (grid types, colors, sizes, language) locally using the browser's `storage.sync` API
 - ✅ Runs entirely on your device
 - ❌ Does **not** collect browsing history
 - ❌ Does **not** collect personal information
@@ -27,6 +27,7 @@ This extension:
 | Permission | Purpose |
 |---|---|
 | `storage` | Save your grid settings locally |
+| `contextMenus` | Add a right-click menu option to toggle the grid on images |
 | `<all_urls>` (content script) | Overlay grids on images across all websites |
 
 ## Third-Party Services

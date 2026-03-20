@@ -2,7 +2,7 @@ import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { resolve } from 'path';
-import { copyFileSync, existsSync, writeFileSync } from 'fs';
+import { copyFileSync, existsSync } from 'fs';
 
 // Post-build plugin: copies content.css from source to dist
 function copyContentCss(): PluginOption {
@@ -19,9 +19,26 @@ function copyContentCss(): PluginOption {
 }
 
 export default defineConfig(({ mode }) => {
-    const isContentBuild = process.env.BUILD_TARGET === 'content';
+    const buildTarget = process.env.BUILD_TARGET;
 
-    if (isContentBuild) {
+    // Background service worker build
+    if (buildTarget === 'background') {
+        return {
+            build: {
+                outDir: 'dist',
+                emptyOutDir: false,
+                lib: {
+                    entry: resolve(__dirname, 'src/background/index.ts'),
+                    name: 'Background',
+                    formats: ['iife'],
+                    fileName: () => 'background.js',
+                },
+            },
+        };
+    }
+
+    // Content script build
+    if (buildTarget === 'content') {
         return {
             plugins: [react(), copyContentCss()],
             define: {

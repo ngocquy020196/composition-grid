@@ -3,17 +3,15 @@ import { Settings, DEFAULT_SETTINGS } from '../types';
 export async function getSettings(): Promise<Settings> {
     return new Promise((resolve) => {
         chrome.storage.sync.get(
-            DEFAULT_SETTINGS as unknown as Record<string, unknown>,
-            (result) => {
-                resolve(result as unknown as Settings);
-            }
+            { ...DEFAULT_SETTINGS },
+            (result) => resolve(result as unknown as Settings)
         );
     });
 }
 
 export async function saveSettings(settings: Partial<Settings>): Promise<void> {
     return new Promise((resolve) => {
-        chrome.storage.sync.set(settings as Record<string, unknown>, resolve);
+        chrome.storage.sync.set(settings, resolve);
     });
 }
 

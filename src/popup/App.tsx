@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Settings, DEFAULT_SETTINGS, GridType, Language } from '../types';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Settings, DEFAULT_SETTINGS, GridType, Language, SpiralOrientation } from '../types';
 import { getSettings, saveSettings } from '../utils/storage';
 import { t } from '../i18n';
 
@@ -14,11 +14,13 @@ const App: React.FC = () => {
         });
     }, []);
 
-    const update = <K extends keyof Settings>(key: K, value: Settings[K]) => {
-        const next = { ...settings, [key]: value };
-        setSettings(next);
-        saveSettings({ [key]: value });
-    };
+    const update = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
+        setSettings((prev) => {
+            const next = { ...prev, [key]: value };
+            saveSettings({ [key]: value });
+            return next;
+        });
+    }, []);
 
     const lang = settings.language;
 
@@ -53,9 +55,14 @@ const App: React.FC = () => {
                 </div>
             </header>
 
-            {/* Master toggle */}
+            {/* Enable grid toggle */}
             <div className="setting-row toggle-row">
-                <span className="setting-label">{t('enableGrid', lang)}</span>
+                <div className="setting-label-group">
+                    <span className="setting-label">{t('enableGrid', lang)}</span>
+                    <span className="shortcut-hint">
+                        <kbd>Alt</kbd><span className="shortcut-plus">+</span><kbd>G</kbd>
+                    </span>
+                </div>
                 <button
                     className={`toggle-btn ${settings.enabled ? 'active' : ''}`}
                     onClick={() => update('enabled', !settings.enabled)}
@@ -68,7 +75,7 @@ const App: React.FC = () => {
                 </button>
             </div>
 
-            {/* Master toggle */}
+            {/* Show dots toggle */}
             {settings.enabled && (
                 <div className="setting-row toggle-row">
                     <span className="setting-label">{t('showDots', lang)}</span>
@@ -86,24 +93,49 @@ const App: React.FC = () => {
             )}
             <div className="divider" />
 
-            {/* Grid type */}
-            <div className="setting-row">
+            {/* Grid type (multi-select) */}
+            <div className="setting-row setting-row-grid">
                 <span className="setting-label">{t('gridType', lang)}</span>
-                <div className="segmented-control">
-                    <button
-                        className={settings.gridType === 'thirds' ? 'seg-active' : ''}
-                        onClick={() => update('gridType', 'thirds' as GridType)}
-                    >
-                        {t('thirds', lang)}
-                    </button>
-                    <button
-                        className={settings.gridType === 'golden' ? 'seg-active' : ''}
-                        onClick={() => update('gridType', 'golden' as GridType)}
-                    >
-                        {t('golden', lang)}
-                    </button>
+                <div className="grid-type-selector">
+                    {(['thirds', 'golden', 'fibonacci', 'triangle'] as GridType[]).map((type) => (
+                        <button
+                            key={type}
+                            className={settings.gridTypes.includes(type) ? 'seg-active' : ''}
+                            onClick={() => {
+                                const current = settings.gridTypes;
+                                const newTypes = current.includes(type)
+                                    ? current.filter((t) => t !== type)
+                                    : [...current, type];
+                                // Ensure at least one type is selected
+                                if (newTypes.length > 0) {
+                                    update('gridTypes', newTypes);
+                                }
+                            }}
+                        >
+                            {t(type, lang)}
+                        </button>
+                    ))}
                 </div>
             </div>
+
+            {/* Spiral orientation (only when fibonacci is selected) */}
+            {settings.gridTypes.includes('fibonacci') && (
+                <div className="setting-row">
+                    <span className="setting-label">{t('spiralOrientation', lang)}</span>
+                    <div className="segmented-control">
+                        {([0, 1, 2, 3] as SpiralOrientation[]).map((orient) => (
+                            <button
+                                key={orient}
+                                className={settings.spiralOrientation === orient ? 'seg-active' : ''}
+                                onClick={() => update('spiralOrientation', orient)}
+                                title={['↱ Top-Left', '↲ Top-Right', '↳ Bottom-Right', '↰ Bottom-Left'][orient]}
+                            >
+                                {['↱', '↲', '↳', '↰'][orient]}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Line color */}
             <div className="setting-row">
@@ -179,13 +211,13 @@ const App: React.FC = () => {
                 <div className="segmented-control">
                     <button
                         className={settings.language === 'en' ? 'seg-active' : ''}
-                        onClick={() => update('language', 'en' as Language)}
+                        onClick={() => update('language', 'en')}
                     >
                         EN
                     </button>
                     <button
                         className={settings.language === 'vi' ? 'seg-active' : ''}
-                        onClick={() => update('language', 'vi' as Language)}
+                        onClick={() => update('language', 'vi')}
                     >
                         VI
                     </button>
@@ -194,7 +226,7 @@ const App: React.FC = () => {
 
             {/* Footer */}
             <footer className="popup-footer">
-                <span>{t('version', lang)} 1.0.0</span>
+                <span>{t('version', lang)} 1.0.1</span>
                 <br />
                 <span>
                     Powered by <a href={t('authorWebsite', lang)} target="_blank" rel="noopener noreferrer">{t('authorName', lang)}</a>
