@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QS0Z1NVHKL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-QS0Z1NVHKL');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 — Page Not Found | Composition Grid</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/png" href="/images/icon128.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #09090b;
+            color: #f4f4f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .glow-1 {
+            width: 400px; height: 400px;
+            background: #a78bfa;
+            top: -100px; left: 30%;
+        }
+
+        .glow-2 {
+            width: 300px; height: 300px;
+            background: #ec4899;
+            bottom: -50px; right: 25%;
+        }
+
+        .container {
+            position: relative;
+            padding: 24px;
+            max-width: 500px;
+        }
+
+        .grid-svg {
+            margin-bottom: 32px;
+            opacity: 0.6;
+        }
+
+        .code {
+            font-size: clamp(72px, 15vw, 120px);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            background: linear-gradient(135deg, #a78bfa, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #a1a1aa;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            background: linear-gradient(135deg, #a78bfa, #ec4899);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        .btn:hover {
+            box-shadow: 0 6px 30px rgba(167, 139, 250, 0.45);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="container">
+        <svg class="grid-svg" width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="rgba(167,139,250,0.5)" stroke-width="1.5">
+            <rect x="5" y="5" width="90" height="90" rx="6" />
+            <line x1="33" y1="5" x2="33" y2="95" />
+            <line x1="66" y1="5" x2="66" y2="95" />
+            <line x1="5" y1="33" x2="95" y2="33" />
+            <line x1="5" y1="66" x2="95" y2="66" />
+            <line x1="5" y1="5" x2="95" y2="95" stroke="rgba(236,72,153,0.3)" stroke-dasharray="4 4" />
+        </svg>
+
+        <div class="code">404</div>
+        <h1>Page not found</h1>
+        <p>The page you're looking for doesn't exist or has been moved. Let's get you back on the grid.</p>
+        <a href="/" class="btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5" />
+                <path d="M12 19l-7-7 7-7" />
+            </svg>
+            Back to Home
+        </a>
+    </div>
+</body>
+
+</html>
