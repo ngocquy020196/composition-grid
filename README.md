@@ -15,6 +15,11 @@
   <img src="https://img.shields.io/badge/lang-EN%20%7C%20VI-blueviolet" alt="Languages" />
 </p>
 
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/composition-grid-rule-of/jogbipaobeabiebmceafacioemlincdl"><img src="https://img.shields.io/badge/Chrome-Install-4285F4?logo=googlechrome&logoColor=white" alt="Chrome Web Store" /></a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/keaefbocibpijkfgjlbcdlgahplmekof"><img src="https://img.shields.io/badge/Edge-Install-0078D7?logo=microsoftedge&logoColor=white" alt="Edge Add-ons" /></a>
+</p>
+
 ---
 
 A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**, **Golden Ratio**, **Fibonacci Spiral**, and **Golden Triangle** composition grids directly onto images on any website. Perfect for photographers, designers, and visual artists who want to analyze compositional balance without leaving the browser.
