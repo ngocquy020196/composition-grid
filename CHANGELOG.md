@@ -14,6 +14,7 @@
 - **Additional Keyboard Shortcuts**:
   - `Alt+D` — Toggle intersection dots
   - `Alt+L` — Switch between solid and dashed lines
+- **Dynamic Context Menu** — Right-click menu automatically hides on blocked/disabled sites
 
 ### 🔧 Improvements
 
@@ -21,9 +22,11 @@
 - **Shared Settings Hook** — New `useSettings` hook with debounced saves to avoid Chrome storage rate limits
 - **Smart Tab Reuse** — "Allowed Sites" button reuses existing options tab instead of opening duplicates
 - **Cleaner Build Output** — Banner folder and `.DS_Store` excluded from `dist/`
+- **Minimal Permissions** — Removed `activeTab` and `scripting` permissions; only requires `storage`, `contextMenus`, and `tabs`
 
 ### 🧹 Cleanup
 
+- Removed `alert()` on blocked sites — replaced with hidden context menu
 - Removed dead CSS classes (`.cg-grid-wrapper`, `.site-rules-row`, `.reset-link`)
 - Removed unused code from previous iterations
 
