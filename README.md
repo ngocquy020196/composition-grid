@@ -10,7 +10,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/manifest-v3-blue" alt="Manifest V3" />
-  <img src="https://img.shields.io/badge/version-1.0.1-green" alt="Version" />
+  <img src="https://img.shields.io/badge/version-1.0.2-green" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License" />
   <img src="https://img.shields.io/badge/lang-EN%20%7C%20VI-blueviolet" alt="Languages" />
 </p>
@@ -29,9 +29,10 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 - 📐 **Four Grid Types** — Rule of Thirds, Golden Ratio, Fibonacci Spiral & Golden Triangle
 - 🔴 **Intersection Dots** — Highlight power points with toggleable dots
 - 🎨 **Custom Colors** — Pick any color for grid lines and dots
-- ⌨️ **Keyboard Shortcut** — Press `Alt+G` to toggle grid without opening the popup
+- ⌨️ **Keyboard Shortcuts** — `Alt+G` toggle grid, `Alt+D` toggle dots, `Alt+L` toggle line style
 - 🖱️ **Context Menu** — Right-click any image to toggle the grid overlay
-- 🌐 **Works Everywhere** — Activates on all websites automatically
+- 🌐 **Site Mode** — All Sites / Block List / Allow List — control where the grid appears
+- ⚙️ **Options Page** — Dedicated settings page with site management
 - 🌍 **Bilingual** — English & Vietnamese (Tiếng Việt)
 - ⚡ **High Performance** — Uses IntersectionObserver & MutationObserver for efficient image detection
 - 🧩 **Manifest V3** — Built with the latest Chrome & Edge extension standard
@@ -71,14 +72,26 @@ composition-grid/
 │   └── manifest.json           # Extension manifest (Chrome & Edge)
 ├── src/
 │   ├── background/
-│   │   └── index.ts            # Service worker (context menu & keyboard shortcut)
+│   │   └── index.ts            # Service worker (context menu & keyboard shortcuts)
 │   ├── components/
-│   │   └── GridOverlay.tsx     # SVG grid + intersection dots component
+│   │   ├── GridOverlay.tsx     # SVG grid + intersection dots component
+│   │   └── grids/
+│   │       ├── index.ts        # Grid exports
+│   │       ├── StandardGrid.tsx # Rule of Thirds & Golden Ratio grid
+│   │       ├── FibonacciSpiral.tsx # Fibonacci spiral overlay
+│   │       ├── GoldenTriangle.tsx  # Golden triangle/diagonal lines
+│   │       └── IntersectionDot.tsx # Intersection dot component
 │   ├── content/
 │   │   ├── index.ts            # Content script (image detection & injection)
 │   │   └── content.css         # Overlay positioning styles
+│   ├── hooks/
+│   │   └── useSettings.ts     # Shared settings hook (debounced saves)
 │   ├── i18n/
 │   │   └── index.ts            # Internationalization (EN/VI)
+│   ├── options/
+│   │   ├── Options.tsx         # Options page (settings + site management)
+│   │   ├── main.tsx            # Options entry point
+│   │   └── options.css         # Options page styles
 │   ├── popup/
 │   │   ├── App.tsx             # Settings popup UI
 │   │   ├── main.tsx            # Popup entry point
@@ -86,7 +99,9 @@ composition-grid/
 │   ├── utils/
 │   │   └── storage.ts          # Chrome storage API wrapper
 │   └── types.ts                # TypeScript types & default settings
+├── landing/                    # Landing page (static HTML/CSS)
 ├── popup.html                  # Popup HTML shell
+├── options.html                # Options page HTML shell
 ├── vite.config.ts              # Vite config (popup + content + background builds)
 ├── tsconfig.json
 └── package.json
@@ -151,6 +166,9 @@ npm run build:content
 | Dot Color | Color of intersection dots | `#ffffff` |
 | Dot Size | Size of intersection dots (2–20px) | `8px` |
 | Line Width | Thickness of grid lines (0.5–5px) | `1px` |
+| Line Style | Solid or Dashed | Solid |
+| Skip Small Images | Minimum image size to show grid (50–500px) | `200px` |
+| Site Mode | All Sites / Block List / Allow List | All Sites |
 | Language | English or Vietnamese | English |
 
 ## ⌨️ Keyboard Shortcuts
@@ -158,8 +176,10 @@ npm run build:content
 | Shortcut | Action |
 |---|---|
 | `Alt+G` | Toggle grid overlay on/off |
+| `Alt+D` | Toggle intersection dots |
+| `Alt+L` | Switch between solid and dashed lines |
 
-You can customize this shortcut at `chrome://extensions/shortcuts`.
+You can customize these shortcuts at `chrome://extensions/shortcuts` or `edge://extensions/shortcuts`.
 
 ## 🤝 Contributing
 
