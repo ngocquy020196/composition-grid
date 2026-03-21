@@ -1,9 +1,4 @@
-/* Grid overlay wrapper — injected by content script */
-.cg-grid-wrapper {
-    position: relative !important;
-    display: inline-block !important;
-}
-
+/* Grid overlay — injected by content script */
 .cg-grid-overlay-root {
     position: absolute !important;
     top: 0 !important;
