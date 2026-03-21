@@ -13,17 +13,13 @@ const translations = {
         en: 'Enable Grid',
         vi: 'Bật Lưới',
     },
-    shortcutHint: {
-        en: 'to toggle quickly',
-        vi: 'bật/tắt nhanh',
-    },
     gridType: {
         en: 'Grid Type',
         vi: 'Loại Lưới',
     },
     showDots: {
         en: 'Show Dots',
-        vi: 'Hiển Thị Chấm',
+        vi: 'Hiện Chấm',
     },
     thirds: {
         en: 'Rule of Thirds',
@@ -65,6 +61,74 @@ const translations = {
         en: 'Line Width',
         vi: 'Độ Dày Đường Kẻ',
     },
+    lineStyle: {
+        en: 'Line Style',
+        vi: 'Kiểu Nét',
+    },
+    solid: {
+        en: 'Solid',
+        vi: 'Nét Liền',
+    },
+    dashed: {
+        en: 'Dashed',
+        vi: 'Nét Đứt',
+    },
+    minImageSize: {
+        en: 'Skip Small Images',
+        vi: 'Bỏ Qua Ảnh Dưới',
+    },
+    resetSettings: {
+        en: 'Reset to Defaults',
+        vi: 'Khôi Phục Mặc Định',
+    },
+    tabSiteRules: {
+        en: 'Allowed Sites',
+        vi: 'Phạm Vi Hiển Thị',
+    },
+    siteMode: {
+        en: 'Mode',
+        vi: 'Chế Độ',
+    },
+    siteModeAll: {
+        en: 'All Sites',
+        vi: 'Tất Cả',
+    },
+    siteModeBlock: {
+        en: 'Block List',
+        vi: 'Chặn',
+    },
+    siteModeAllow: {
+        en: 'Allow List',
+        vi: 'Cho Phép',
+    },
+    siteModeAllDesc: {
+        en: 'Grid appears on all websites',
+        vi: 'Lưới hiện trên tất cả trang',
+    },
+    siteModeBlockDesc: {
+        en: 'Grid appears everywhere except these sites',
+        vi: 'Lưới hiện mọi nơi trừ các trang này',
+    },
+    siteModeAllowDesc: {
+        en: 'Grid only appears on these sites',
+        vi: 'Lưới chỉ hiện trên các trang này',
+    },
+    addSite: {
+        en: 'Add',
+        vi: 'Thêm',
+    },
+    siteInputPlaceholder: {
+        en: 'e.g. facebook.com',
+        vi: 'VD: facebook.com',
+    },
+    siteBlockedAlert: {
+        en: 'Composition Grid is disabled on this website.',
+        vi: 'Lưới bố cục đã bị tắt trên trang này.',
+    },
+    noSites: {
+        en: 'No sites added yet',
+        vi: 'Chưa có trang nào',
+    },
     language: {
         en: 'Language',
         vi: 'Ngôn Ngữ',
@@ -81,10 +145,6 @@ const translations = {
         en: 'Version',
         vi: 'Phiên Bản',
     },
-    author: {
-        en: 'Author',
-        vi: 'Tác Giả',
-    },
     authorName: {
         en: 'Quy Nguyen',
         vi: 'Quy Nguyen',
@@ -92,10 +152,6 @@ const translations = {
     authorWebsite: {
         en: 'https://ngocquy.dev',
         vi: 'https://ngocquy.dev',
-    },
-    authorEmail: {
-        en: 'contact@ngocquy.dev',
-        vi: 'contact@ngocquy.dev',
     },
 } as const satisfies Record<string, Record<Language, string>>;
 
