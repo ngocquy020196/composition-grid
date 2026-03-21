@@ -575,6 +575,15 @@ body {
     color: var(--text);
 }
 
+.bmc-link {
+    color: #fbbf24 !important;
+    font-weight: 600;
+}
+
+.bmc-link:hover {
+    color: #fde68a !important;
+}
+
 .footer-bottom {
     text-align: center;
     padding-top: 16px;

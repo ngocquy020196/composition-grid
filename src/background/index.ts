@@ -33,22 +33,47 @@ chrome.storage.onChanged.addListener((changes) => {
     }
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === MENU_ID && tab?.id) {
-        chrome.tabs.sendMessage(tab.id, {
-            type: 'TOGGLE_GRID',
-            srcUrl: info.srcUrl,
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+    if (info.menuItemId !== MENU_ID || !tab?.id || !tab.url) return;
+
+    // Check site mode
+    const result = await chrome.storage.sync.get({ siteMode: 'all', blockList: [], allowList: [], language: 'en' });
+    const url = new URL(tab.url);
+    const host = url.hostname;
+    const isBlocked =
+        (result.siteMode === 'block' && (result.blockList as string[]).some((s) => host.includes(s))) ||
+        (result.siteMode === 'allow' && !(result.allowList as string[]).some((s) => host.includes(s)));
+
+    if (isBlocked) {
+        const msg = t('siteBlockedAlert', result.language as Language);
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: (alertMsg: string) => alert(alertMsg),
+            args: [msg],
         });
+        return;
     }
+
+    chrome.tabs.sendMessage(tab.id, {
+        type: 'TOGGLE_GRID',
+        srcUrl: info.srcUrl,
+    });
 });
 
-// Keyboard shortcut handler (Alt+G)
+// Keyboard shortcut handler
 chrome.commands.onCommand.addListener((command) => {
-    if (command === 'toggle-grid') {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs[0]?.id) {
-                chrome.tabs.sendMessage(tabs[0].id, { type: 'TOGGLE_GRID_ALL' });
-            }
-        });
-    }
+    const messageMap: Record<string, string> = {
+        'toggle-grid': 'TOGGLE_GRID_ALL',
+        'toggle-dots': 'TOGGLE_DOTS',
+        'toggle-line-style': 'TOGGLE_LINE_STYLE',
+    };
+
+    const type = messageMap[command];
+    if (!type) return;
+
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.id) {
+            chrome.tabs.sendMessage(tabs[0].id, { type });
+        }
+    });
 });

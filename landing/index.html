@@ -6,7 +6,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QS0Z1NVHKL"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-QS0Z1NVHKL');
     </script>
@@ -28,8 +28,7 @@
         content="Overlay Rule of Thirds, Golden Ratio, Fibonacci Spiral & Triangle grids on any image. Free browser extension for photographers & designers." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://composition-grid.ngocquy.dev/" />
-    <meta property="og:image"
-        content="https://composition-grid.ngocquy.dev/images/popup-screenshot.png" />
+    <meta property="og:image" content="https://composition-grid.ngocquy.dev/images/popup-screenshot.png" />
     <meta property="og:image:alt" content="Composition Grid extension popup interface" />
     <meta property="og:site_name" content="Composition Grid" />
     <meta property="og:locale" content="en_US" />
@@ -39,8 +38,7 @@
     <meta name="twitter:title" content="Composition Grid — Photo Composition Guides" />
     <meta name="twitter:description"
         content="Overlay composition grids on any image right in your browser. Free for Chrome & Edge." />
-    <meta name="twitter:image"
-        content="https://composition-grid.ngocquy.dev/images/popup-screenshot.png" />
+    <meta name="twitter:image" content="https://composition-grid.ngocquy.dev/images/popup-screenshot.png" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="128x128" href="images/icon128.png" />
@@ -72,7 +70,7 @@
             "name": "Quy Nguyen",
             "url": "https://ngocquy.dev"
         },
-        "softwareVersion": "1.0.1",
+        "softwareVersion": "1.0.2",
         "url": "https://composition-grid.ngocquy.dev/",
         "downloadUrl": "https://chromewebstore.google.com/detail/composition-grid-rule-of/jogbipaobeabiebmceafacioemlincdl",
         "screenshot": "https://composition-grid.ngocquy.dev/images/popup-screenshot.png",
@@ -175,8 +173,10 @@
                             <line x1="18" y1="9" x2="18" y2="12" />
                         </svg>
                     </div>
-                    <h3>Keyboard Shortcut</h3>
-                    <p>Press <kbd>Alt</kbd>+<kbd>G</kbd> to toggle grid instantly — no popup needed.</p>
+                    <h3>Keyboard Shortcuts</h3>
+                    <p>Press <kbd>Alt</kbd>+<kbd>G</kbd> to toggle grid, <kbd>Alt</kbd>+<kbd>D</kbd> for dots,
+                        <kbd>Alt</kbd>+<kbd>L</kbd> for line style.
+                    </p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
@@ -214,8 +214,9 @@
                                 d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                         </svg>
                     </div>
-                    <h3>Works Everywhere</h3>
-                    <p>Automatically detects images on any website — Instagram, Unsplash, Flickr & more.</p>
+                    <h3>Site Control</h3>
+                    <p>Choose where the grid appears: All Sites, Block List, or Allow List — managed via Options page.
+                    </p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
@@ -243,11 +244,15 @@
             <div class="screenshots-grid">
                 <div class="screenshot-card">
                     <div class="screenshot-label">Extension Popup</div>
-                    <img src="images/popup-screenshot.png" alt="Composition Grid popup interface showing grid type selector, color picker, and toggle controls" loading="lazy" width="600" height="530" />
+                    <img src="images/popup-screenshot.png"
+                        alt="Composition Grid popup interface showing grid type selector, color picker, and toggle controls"
+                        loading="lazy" width="600" height="530" />
                 </div>
                 <div class="screenshot-card">
                     <div class="screenshot-label">Right-Click Context Menu</div>
-                    <img src="images/context-menu-screenshot.png" alt="Right-click context menu showing Toggle Composition Grid option on a photo" loading="lazy" width="600" height="400" />
+                    <img src="images/context-menu-screenshot.png"
+                        alt="Right-click context menu showing Toggle Composition Grid option on a photo" loading="lazy"
+                        width="600" height="400" />
                 </div>
             </div>
         </div>
@@ -261,10 +266,8 @@
                 <div class="grid-type-card">
                     <div class="grid-type-preview">
                         <svg viewBox="0 0 300 200" role="img" aria-label="Rule of Thirds grid preview">
-                            <line x1="100" y1="0" x2="100" y2="200" stroke="rgba(167,139,250,0.6)"
-                                stroke-width="1.5" />
-                            <line x1="200" y1="0" x2="200" y2="200" stroke="rgba(167,139,250,0.6)"
-                                stroke-width="1.5" />
+                            <line x1="100" y1="0" x2="100" y2="200" stroke="rgba(167,139,250,0.6)" stroke-width="1.5" />
+                            <line x1="200" y1="0" x2="200" y2="200" stroke="rgba(167,139,250,0.6)" stroke-width="1.5" />
                             <line x1="0" y1="66.7" x2="300" y2="66.7" stroke="rgba(167,139,250,0.6)"
                                 stroke-width="1.5" />
                             <line x1="0" y1="133.3" x2="300" y2="133.3" stroke="rgba(167,139,250,0.6)"
@@ -322,12 +325,10 @@
                             <line x1="0" y1="200" x2="300" y2="0" stroke="rgba(52,211,153,0.6)" stroke-width="1.5" />
                             <line x1="0" y1="0" x2="300" y2="200" stroke="rgba(52,211,153,0.4)" stroke-width="1.5" />
                             <line x1="0" y1="0" x2="150" y2="100" stroke="rgba(52,211,153,0.5)" stroke-width="1.2" />
-                            <line x1="300" y1="0" x2="150" y2="100" stroke="rgba(52,211,153,0.45)"
-                                stroke-width="1.2" />
+                            <line x1="300" y1="0" x2="150" y2="100" stroke="rgba(52,211,153,0.45)" stroke-width="1.2" />
                             <line x1="300" y1="200" x2="150" y2="100" stroke="rgba(52,211,153,0.5)"
                                 stroke-width="1.2" />
-                            <line x1="0" y1="200" x2="150" y2="100" stroke="rgba(52,211,153,0.45)"
-                                stroke-width="1.2" />
+                            <line x1="0" y1="200" x2="150" y2="100" stroke="rgba(52,211,153,0.45)" stroke-width="1.2" />
                             <circle cx="150" cy="100" r="4" fill="#34d399" />
                         </svg>
                     </div>
@@ -347,9 +348,12 @@
                 <div class="hero-actions">
                     <a href="https://chromewebstore.google.com/detail/composition-grid-rule-of/jogbipaobeabiebmceafacioemlincdl"
                         target="_blank" rel="noopener" class="btn btn-chrome">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
                             <circle cx="12" cy="12" r="4" fill="currentColor" />
+                            <path d="M12 8L20.5 8" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M8 14L3.5 5" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M16 14L12 22" stroke="currentColor" stroke-width="1.5" />
                         </svg>
                         Chrome Web Store
                     </a>
@@ -377,13 +381,16 @@
                 <div class="footer-links">
                     <a href="https://github.com/ngocquy020196/composition-grid" target="_blank"
                         rel="noopener">GitHub</a>
+                    <a href="/PRIVACY_POLICY.html" rel="noopener">Privacy</a>
                     <a href="https://ngocquy.dev" target="_blank" rel="noopener">Author</a>
                     <a href="mailto:contact@ngocquy.dev">Contact</a>
+                    <a href="https://buymeacoffee.com/ngocquy.dev" target="_blank" rel="noopener" class="bmc-link">Buy
+                        Me a Coffee</a>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>© 2026 Powered by <a href="https://ngocquy.dev" target="_blank" rel="noopener">Quy Nguyen</a>.
-                    Version 1.0.1</p>
+                    Version 1.0.2</p>
             </div>
         </div>
     </footer>

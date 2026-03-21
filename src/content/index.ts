@@ -17,8 +17,10 @@ interface InjectedEntry {
 const injectedMap = new Map<HTMLImageElement, InjectedEntry>();
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const MIN_SIZE = 80;
 const ATTR = 'data-grid-injected';
+
+// Common avatar/thumbnail indicators in class names, alt text, or src
+const SKIP_PATTERNS = /avatar|icon|thumb|logo|badge|emoji|profile[-_]?(?:pic|img|photo)|favicon/i;
 
 // ─── Rendering ───────────────────────────────────────────────────────────────
 function renderOverlay(entry: InjectedEntry, settings: Settings) {
@@ -35,6 +37,7 @@ function renderOverlay(entry: InjectedEntry, settings: Settings) {
             showDots: settings.showDots,
             dotSize: settings.dotSize,
             lineSize: settings.lineSize,
+            lineStyle: settings.lineStyle,
             spiralOrientation: settings.spiralOrientation,
         })
     );
@@ -61,12 +64,29 @@ function cleanupImage(img: HTMLImageElement) {
 // ─── Injection ───────────────────────────────────────────────────────────────
 function shouldInject(img: HTMLImageElement): boolean {
     if (img.getAttribute(ATTR) === 'true') return false;
-    if (img.naturalWidth > 0 && img.naturalWidth < MIN_SIZE) return false;
-    if (img.naturalHeight > 0 && img.naturalHeight < MIN_SIZE) return false;
-    if (img.width < MIN_SIZE || img.height < MIN_SIZE) return false;
-    // Skip tiny icons and avatars
+    const minSize = currentSettings.minImageSize;
+
+    // Size checks — skip small images
+    if (img.naturalWidth > 0 && img.naturalWidth < minSize) return false;
+    if (img.naturalHeight > 0 && img.naturalHeight < minSize) return false;
+    if (img.width < minSize || img.height < minSize) return false;
+
+    // Skip tiny data URIs (inline icons)
     const src = img.src || '';
     if (src.startsWith('data:') && src.length < 500) return false;
+
+    // Skip decorative / presentation images
+    if (img.getAttribute('role') === 'presentation') return false;
+
+    // Skip circular images (likely avatars)
+    const style = window.getComputedStyle(img);
+    const radius = parseFloat(style.borderRadius);
+    if (radius >= Math.min(img.width, img.height) / 2) return false;
+
+    // Skip images whose class, alt, or src match avatar/thumbnail patterns
+    const textToCheck = `${img.className} ${img.alt} ${src}`;
+    if (SKIP_PATTERNS.test(textToCheck)) return false;
+
     return true;
 }
 
@@ -163,6 +183,22 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
         return;
     }
 
+    // Keyboard shortcut: toggle dots
+    if (message.type === 'TOGGLE_DOTS') {
+        currentSettings.showDots = !currentSettings.showDots;
+        chrome.storage.sync.set({ showDots: currentSettings.showDots });
+        renderAllOverlays();
+        return;
+    }
+
+    // Keyboard shortcut: toggle line style (solid ↔ dashed)
+    if (message.type === 'TOGGLE_LINE_STYLE') {
+        currentSettings.lineStyle = currentSettings.lineStyle === 'solid' ? 'dashed' : 'solid';
+        chrome.storage.sync.set({ lineStyle: currentSettings.lineStyle });
+        renderAllOverlays();
+        return;
+    }
+
     if (message.type !== 'TOGGLE_GRID' || !message.srcUrl) return;
 
     // Find the image by its src URL
@@ -202,6 +238,18 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
 async function init() {
     // Load settings
     currentSettings = await getSettings();
+
+    // Check site mode — decide if grid should run on this site
+    const currentHost = window.location.hostname;
+
+    if (currentSettings.siteMode === 'block') {
+        const blocked = currentSettings.blockList.some((site: string) => currentHost.includes(site));
+        if (blocked) return;
+    }
+    if (currentSettings.siteMode === 'allow') {
+        const allowed = currentSettings.allowList.some((site: string) => currentHost.includes(site));
+        if (!allowed) return;
+    }
 
     // Listen for settings changes
     onSettingsChanged((newSettings) => {
