@@ -2,7 +2,7 @@
 
 **Composition Grid: Rule of Thirds, Golden Ratio & More**
 
-*Last updated: March 20, 2026*
+*Last updated: March 22, 2026*
 
 ## Overview
 
@@ -14,7 +14,8 @@ Composition Grid is a browser extension for Chrome and Microsoft Edge that overl
 
 This extension:
 
-- ✅ Stores your settings (grid types, colors, sizes, language) locally using the browser's `storage.sync` API
+- ✅ Stores your settings (grid types, colors, sizes, language, site filter lists) locally using the browser's `storage.sync` API
+- ✅ Reads the active tab's URL **locally** to show/hide the context menu based on your site filter settings
 - ✅ Runs entirely on your device
 - ❌ Does **not** collect browsing history
 - ❌ Does **not** collect personal information
@@ -26,8 +27,9 @@ This extension:
 
 | Permission | Purpose |
 |---|---|
-| `storage` | Save your grid settings locally |
+| `storage` | Save your grid settings and site filter lists locally |
 | `contextMenus` | Add a right-click menu option to toggle the grid on images |
+| `tabs` | Read the active tab's URL to hide the context menu on sites you have blocked or not allowed |
 | `<all_urls>` (content script) | Overlay grids on images across all websites |
 
 ## Third-Party Services
