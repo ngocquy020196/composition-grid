@@ -1,27 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Settings, DEFAULT_SETTINGS, GridType, Language, SpiralOrientation } from '../types';
-import { getSettings, saveSettings } from '../utils/storage';
+import React from 'react';
+import { GridType, LineStyle, SpiralOrientation } from '../types';
+import { useSettings } from '../hooks/useSettings';
 import { t } from '../i18n';
 
 const App: React.FC = () => {
-    const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
-    const [loaded, setLoaded] = useState(false);
-
-    useEffect(() => {
-        getSettings().then((s) => {
-            setSettings(s);
-            setLoaded(true);
-        });
-    }, []);
-
-    const update = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
-        setSettings((prev) => {
-            const next = { ...prev, [key]: value };
-            saveSettings({ [key]: value });
-            return next;
-        });
-    }, []);
-
+    const { settings, loaded, update, reset } = useSettings();
     const lang = settings.language;
 
     if (!loaded) return null;
@@ -78,7 +61,12 @@ const App: React.FC = () => {
             {/* Show dots toggle */}
             {settings.enabled && (
                 <div className="setting-row toggle-row">
-                    <span className="setting-label">{t('showDots', lang)}</span>
+                    <div className="setting-label-group">
+                        <span className="setting-label">{t('showDots', lang)}</span>
+                        <span className="shortcut-hint">
+                            <kbd>Alt</kbd><span className="shortcut-plus">+</span><kbd>D</kbd>
+                        </span>
+                    </div>
                     <button
                         className={`toggle-btn ${settings.showDots ? 'active' : ''}`}
                         onClick={() => update('showDots', !settings.showDots)}
@@ -153,38 +141,39 @@ const App: React.FC = () => {
                 </div>
             </div>
 
-            {/* Dot color */}
-            <div className="setting-row">
-                <span className="setting-label">{t('dotColor', lang)}</span>
-                <div className="color-picker-wrapper">
-                    <div
-                        className="color-swatch"
-                        style={{ backgroundColor: settings.dotColor }}
-                    />
-                    <input
-                        type="color"
-                        value={settings.dotColor}
-                        onChange={(e) => update('dotColor', e.target.value)}
-                    />
-                </div>
-            </div>
-
-            {/* Dot size */}
+            {/* Dot color & size (only when dots are enabled) */}
             {settings.showDots && (
-                <div className="setting-row">
-                    <span className="setting-label">{t('dotSize', lang)}</span>
-                    <div className="slider-wrapper">
-                        <input
-                            type="range"
-                            min={2}
-                            max={20}
-                            step={1}
-                            value={settings.dotSize}
-                            onChange={(e) => update('dotSize', Number(e.target.value))}
-                        />
-                        <span className="slider-value">{settings.dotSize}px</span>
+                <>
+                    <div className="setting-row">
+                        <span className="setting-label">{t('dotColor', lang)}</span>
+                        <div className="color-picker-wrapper">
+                            <div
+                                className="color-swatch"
+                                style={{ backgroundColor: settings.dotColor }}
+                            />
+                            <input
+                                type="color"
+                                value={settings.dotColor}
+                                onChange={(e) => update('dotColor', e.target.value)}
+                            />
+                        </div>
                     </div>
-                </div>
+
+                    <div className="setting-row">
+                        <span className="setting-label">{t('dotSize', lang)}</span>
+                        <div className="slider-wrapper">
+                            <input
+                                type="range"
+                                min={2}
+                                max={20}
+                                step={1}
+                                value={settings.dotSize}
+                                onChange={(e) => update('dotSize', Number(e.target.value))}
+                            />
+                            <span className="slider-value">{settings.dotSize}px</span>
+                        </div>
+                    </div>
+                </>
             )}
 
             {/* Line size */}
@@ -201,6 +190,65 @@ const App: React.FC = () => {
                     />
                     <span className="slider-value">{settings.lineSize}px</span>
                 </div>
+            </div>
+
+            {/* Line style */}
+            <div className="setting-row">
+                <div className="setting-label-group">
+                    <span className="setting-label">{t('lineStyle', lang)}</span>
+                    <span className="shortcut-hint">
+                        <kbd>Alt</kbd><span className="shortcut-plus">+</span><kbd>L</kbd>
+                    </span>
+                </div>
+                <div className="segmented-control">
+                    {(['solid', 'dashed'] as LineStyle[]).map((style) => (
+                        <button
+                            key={style}
+                            className={settings.lineStyle === style ? 'seg-active' : ''}
+                            onClick={() => update('lineStyle', style)}
+                        >
+                            {t(style, lang)}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Min image size */}
+            <div className="setting-row">
+                <span className="setting-label">{t('minImageSize', lang)}</span>
+                <div className="slider-wrapper">
+                    <input
+                        type="range"
+                        min={50}
+                        max={500}
+                        step={50}
+                        value={settings.minImageSize}
+                        onChange={(e) => update('minImageSize', Number(e.target.value))}
+                    />
+                    <span className="slider-value">{settings.minImageSize}px</span>
+                </div>
+            </div>
+
+            {/* Action buttons — Site Rules left, Reset right */}
+            <div className="setting-row">
+                <button
+                    className="reset-btn active-btn"
+                    onClick={async () => {
+                        const optUrl = chrome.runtime.getURL('options.html');
+                        const allTabs = await chrome.tabs.query({});
+                        const existing = allTabs.find((t) => t.url?.startsWith(optUrl));
+                        if (existing?.id) {
+                            chrome.tabs.update(existing.id, { url: optUrl + '#sites', active: true });
+                        } else {
+                            chrome.tabs.create({ url: optUrl + '#sites' });
+                        }
+                    }}
+                >
+                    {t('tabSiteRules', lang)}
+                </button>
+                <button className="reset-btn" onClick={reset}>
+                    {t('resetSettings', lang)}
+                </button>
             </div>
 
             <div className="divider" />
@@ -226,7 +274,7 @@ const App: React.FC = () => {
 
             {/* Footer */}
             <footer className="popup-footer">
-                <span>{t('version', lang)} 1.0.1</span>
+                <span>{t('version', lang)} 1.0.2</span>
                 <br />
                 <span>
                     Powered by <a href={t('authorWebsite', lang)} target="_blank" rel="noopener noreferrer">{t('authorName', lang)}</a>
