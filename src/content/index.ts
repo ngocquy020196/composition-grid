@@ -160,23 +160,8 @@ function observeImage(img: HTMLImageElement) {
 }
 
 // ─── MutationObserver ────────────────────────────────────────────────────────
-function checkInjectedVisibility() {
-    injectedMap.forEach((_entry, img) => {
-        if (!isVisibleInDOM(img)) {
-            cleanupImage(img);
-        }
-    });
-}
-
 const mutationObserver = new MutationObserver((mutations) => {
-    let needsVisibilityCheck = false;
-
     for (const mutation of mutations) {
-        // Handle attribute changes (style/class) — may hide images
-        if (mutation.type === 'attributes') {
-            needsVisibilityCheck = true;
-        }
-
         // Handle added nodes
         for (const node of mutation.addedNodes) {
             if (node.nodeType !== Node.ELEMENT_NODE) continue;
@@ -205,10 +190,6 @@ const mutationObserver = new MutationObserver((mutations) => {
                 cleanupImage(el as HTMLImageElement);
             }
         }
-    }
-
-    if (needsVisibilityCheck) {
-        checkInjectedVisibility();
     }
 });
 
@@ -300,12 +281,10 @@ async function init() {
     const existingImages = document.querySelectorAll<HTMLImageElement>('img');
     existingImages.forEach(observeImage);
 
-    // Watch for new images and attribute changes (style/class)
+    // Watch for new images
     mutationObserver.observe(document.body, {
         childList: true,
         subtree: true,
-        attributes: true,
-        attributeFilter: ['style', 'class', 'hidden'],
     });
 }
 
