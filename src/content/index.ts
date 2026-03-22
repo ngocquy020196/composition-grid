@@ -219,6 +219,17 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
         return;
     }
 
+    // Keyboard shortcut: toggle color (colorA ↔ colorB)
+    if (message.type === 'TOGGLE_COLOR') {
+        const { toggleColorA, toggleColorB } = currentSettings;
+        const newColor = currentSettings.lineColor === toggleColorA ? toggleColorB : toggleColorA;
+        currentSettings.lineColor = newColor;
+        currentSettings.dotColor = newColor;
+        chrome.storage.sync.set({ lineColor: newColor, dotColor: newColor });
+        renderAllOverlays();
+        return;
+    }
+
     if (message.type !== 'TOGGLE_GRID' || !message.srcUrl) return;
 
     // Find the image by its src URL

@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.0.4 — 2026-03-23
+
+### ✨ New Features
+
+- **Quick Color Toggle** — Instantly swap grid color between two presets with `Alt+C`
+  - Customizable color pair — pick any two colors in the popup (default: white ↔ black)
+  - Toggles both line color and dot color simultaneously
+
+### 🔧 Improvements
+
+- **Better Color Swatch Visibility** — Increased border contrast on color pickers so dark colors are visible in dark mode
+- Added `--swatch-border` CSS variable for consistent swatch styling across themes
+
+---
+
 ## v1.0.3 — 2026-03-22
 
 ### ✨ New Features

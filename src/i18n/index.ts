@@ -165,6 +165,10 @@ const translations = {
         en: 'Light',
         vi: 'Sáng',
     },
+    quickColor: {
+        en: 'Quick Color',
+        vi: 'Đổi Màu Nhanh',
+    },
 } as const satisfies Record<string, Record<Language, string>>;
 
 export type TranslationKey = keyof typeof translations;
