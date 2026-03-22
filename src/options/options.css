@@ -103,7 +103,7 @@ body {
     font-size: 12px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--input-bg);
     color: var(--text-primary);
     outline: none;
     transition: border-color 0.2s;
@@ -147,7 +147,7 @@ body {
     justify-content: space-between;
     padding: 8px 12px;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--site-item-bg);
     border: 1px solid var(--border);
 }
 

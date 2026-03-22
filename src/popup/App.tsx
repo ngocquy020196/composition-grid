@@ -1,11 +1,16 @@
-import React from 'react';
-import { GridType, LineStyle, SpiralOrientation } from '../types';
+import React, { useEffect } from 'react';
+import { GridType, LineStyle, SpiralOrientation, Theme } from '../types';
 import { useSettings } from '../hooks/useSettings';
 import { t } from '../i18n';
 
 const App: React.FC = () => {
     const { settings, loaded, update, reset } = useSettings();
     const lang = settings.language;
+
+    // Apply theme to document root
+    useEffect(() => {
+        document.documentElement.dataset.theme = settings.theme;
+    }, [settings.theme]);
 
     if (!loaded) return null;
 
@@ -253,6 +258,22 @@ const App: React.FC = () => {
 
             <div className="divider" />
 
+            {/* Theme */}
+            <div className="setting-row">
+                <span className="setting-label">{t('theme', lang)}</span>
+                <div className="segmented-control">
+                    {(['dark', 'light'] as Theme[]).map((themeOption) => (
+                        <button
+                            key={themeOption}
+                            className={settings.theme === themeOption ? 'seg-active' : ''}
+                            onClick={() => update('theme', themeOption)}
+                        >
+                            {t(themeOption, lang)}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* Language */}
             <div className="setting-row">
                 <span className="setting-label">{t('language', lang)}</span>
@@ -274,7 +295,7 @@ const App: React.FC = () => {
 
             {/* Footer */}
             <footer className="popup-footer">
-                <span>{t('version', lang)} 1.0.2</span>
+                <span>{t('version', lang)} {chrome.runtime.getManifest().version}</span>
                 <br />
                 <span>
                     Powered by <a href={t('authorWebsite', lang)} target="_blank" rel="noopener noreferrer">{t('authorName', lang)}</a>

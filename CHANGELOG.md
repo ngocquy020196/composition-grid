@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.0.3 — 2026-03-22
+
+### ✨ New Features
+
+- **Dark / Light Theme** — Switch between dark and light interface for popup & options page
+  - New segmented control in the popup to toggle theme
+  - Theme preference saved to Chrome Storage and persists across sessions
+
+### 🔧 Improvements
+
+- Refactored CSS variables to support both themes — extracted hardcoded `rgba()` values into reusable custom properties
+- Fixed toggle switch text readability on active state in light theme
+
+---
+
 ## v1.0.2 — 2026-03-22
 
 ### ✨ New Features

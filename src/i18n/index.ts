@@ -153,6 +153,18 @@ const translations = {
         en: 'https://ngocquy.dev',
         vi: 'https://ngocquy.dev',
     },
+    theme: {
+        en: 'Theme',
+        vi: 'Giao Diện',
+    },
+    dark: {
+        en: 'Dark',
+        vi: 'Tối',
+    },
+    light: {
+        en: 'Light',
+        vi: 'Sáng',
+    },
 } as const satisfies Record<string, Record<Language, string>>;
 
 export type TranslationKey = keyof typeof translations;

@@ -10,7 +10,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/manifest-v3-blue" alt="Manifest V3" />
-  <img src="https://img.shields.io/badge/version-1.0.2-green" alt="Version" />
+  <img src="https://img.shields.io/badge/version-1.0.3-green" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License" />
   <img src="https://img.shields.io/badge/lang-EN%20%7C%20VI-blueviolet" alt="Languages" />
 </p>
@@ -32,6 +32,7 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 - ⌨️ **Keyboard Shortcuts** — `Alt+G` toggle grid, `Alt+D` toggle dots, `Alt+L` toggle line style
 - 🖱️ **Context Menu** — Right-click any image to toggle the grid overlay
 - 🌐 **Site Mode** — All Sites / Block List / Allow List — control where the grid appears
+- 🌗 **Dark / Light Theme** — Switch between dark and light interface
 - ⚙️ **Options Page** — Dedicated settings page with site management
 - 🌍 **Bilingual** — English & Vietnamese (Tiếng Việt)
 - ⚡ **High Performance** — Uses IntersectionObserver & MutationObserver for efficient image detection
@@ -169,6 +170,7 @@ npm run build:content
 | Line Style | Solid or Dashed | Solid |
 | Skip Small Images | Minimum image size to show grid (50–500px) | `200px` |
 | Site Mode | All Sites / Block List / Allow List | All Sites |
+| Theme | Dark or Light interface | Dark |
 | Language | English or Vietnamese | English |
 
 ## ⌨️ Keyboard Shortcuts
