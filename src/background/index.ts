@@ -83,7 +83,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.tabs.sendMessage(tab.id, {
         type: 'TOGGLE_GRID',
         srcUrl: info.srcUrl,
-    });
+    }).catch(() => { /* content script not loaded on this tab */ });
 });
 
 // Keyboard shortcut handler
@@ -99,7 +99,7 @@ chrome.commands.onCommand.addListener((command) => {
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.id) {
-            chrome.tabs.sendMessage(tabs[0].id, { type });
+            chrome.tabs.sendMessage(tabs[0].id, { type }).catch(() => { /* content script not loaded */ });
         }
     });
 });
