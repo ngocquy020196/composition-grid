@@ -62,9 +62,29 @@ function cleanupImage(img: HTMLImageElement) {
 }
 
 // ─── Injection ───────────────────────────────────────────────────────────────
+function isElementVisible(el: HTMLElement): boolean {
+    const style = window.getComputedStyle(el);
+    if (style.display === 'none') return false;
+    if (style.visibility === 'hidden') return false;
+    if (parseFloat(style.opacity) === 0) return false;
+    return true;
+}
+
+function isVisibleInDOM(el: HTMLElement): boolean {
+    let current: HTMLElement | null = el;
+    while (current) {
+        if (!isElementVisible(current)) return false;
+        current = current.parentElement;
+    }
+    return true;
+}
+
 function shouldInject(img: HTMLImageElement): boolean {
     if (img.getAttribute(ATTR) === 'true') return false;
     const minSize = currentSettings.minImageSize;
+
+    // Skip hidden images (display:none, visibility:hidden, opacity:0)
+    if (!isVisibleInDOM(img)) return false;
 
     // Size checks — skip small images
     if (img.naturalWidth > 0 && img.naturalWidth < minSize) return false;
