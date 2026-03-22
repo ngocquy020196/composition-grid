@@ -169,6 +169,10 @@ const translations = {
         en: 'Quick Color',
         vi: 'Đổi Màu Nhanh',
     },
+    quickColorHint: {
+        en: 'Applied to lines & dots',
+        vi: 'Áp dụng cho cả đường kẻ và chấm',
+    },
 } as const satisfies Record<string, Record<Language, string>>;
 
 export type TranslationKey = keyof typeof translations;
