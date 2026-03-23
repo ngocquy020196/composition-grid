@@ -221,6 +221,7 @@ const PENDING = 'data-grid-pending';
 
 function tryInjectOrDefer(img: HTMLImageElement) {
     if (img.getAttribute(ATTR) === 'true') return;
+    if (img.getAttribute(PENDING) === 'true') return;
     if (shouldInject(img)) {
         injectGrid(img);
         return;
@@ -228,13 +229,30 @@ function tryInjectOrDefer(img: HTMLImageElement) {
 
     // Image may not be loaded yet (width/height = 0 on lazy-loaded sites).
     // Wait for its load event and retry once.
-    // Use a pending flag to avoid attaching multiple listeners.
-    if (!img.complete && img.getAttribute(PENDING) !== 'true') {
+    if (!img.complete) {
         img.setAttribute(PENDING, 'true');
         img.addEventListener('load', () => {
             img.removeAttribute(PENDING);
             if (shouldInject(img)) injectGrid(img);
         }, { once: true });
+        return;
+    }
+
+    // Image is loaded but has zero/small dimensions (e.g. React lightbox animation).
+    // Watch for resize and retry once it reaches visible size.
+    const minSize = currentSettings.minImageSize;
+    if (img.width < minSize || img.height < minSize) {
+        img.setAttribute(PENDING, 'true');
+        const ro = new ResizeObserver(() => {
+            if (img.width >= minSize && img.height >= minSize) {
+                ro.disconnect();
+                img.removeAttribute(PENDING);
+                if (shouldInject(img)) injectGrid(img);
+            }
+        });
+        ro.observe(img);
+        // Auto-cleanup after 10s to avoid memory leaks
+        setTimeout(() => { ro.disconnect(); img.removeAttribute(PENDING); }, 10000);
     }
 }
 
