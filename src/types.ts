@@ -7,6 +7,7 @@ export type Theme = 'dark' | 'light';
 
 export interface Settings {
     enabled: boolean;
+    videoEnabled: boolean;
     gridTypes: GridType[];
     lineColor: string;
     dotColor: string;
@@ -27,6 +28,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
     enabled: true,
+    videoEnabled: false,
     gridTypes: ['thirds', 'triangle'],
     lineColor: '#ffffff',
     dotColor: '#ffffff',

@@ -10,8 +10,12 @@ const translations = {
         vi: 'Hướng Dẫn Bố Cục Cho Mọi Bức Ảnh',
     },
     enableGrid: {
-        en: 'Enable Grid',
-        vi: 'Bật Lưới',
+        en: 'Image Overlay',
+        vi: 'Lưới Phủ Ảnh',
+    },
+    videoEnabled: {
+        en: 'Video Overlay',
+        vi: 'Lưới Phủ Video',
     },
     gridType: {
         en: 'Grid Type',
