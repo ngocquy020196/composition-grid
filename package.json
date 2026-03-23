@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && BUILD_TARGET=content vite build && BUILD_TARGET=background vite build && rm -rf dist/banner dist/.DS_Store",
+    "zip": "npm run build && cd dist && zip -r ../composition-grid-v$npm_package_version.zip . && cd .. && echo '✅ Created composition-grid-v'$npm_package_version'.zip'",
     "build:popup": "vite build",
     "build:content": "BUILD_TARGET=content vite build",
     "preview": "vite preview"
