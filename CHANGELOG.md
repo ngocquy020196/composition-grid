@@ -1,5 +1,36 @@
 # Changelog
 
+## v1.0.5 — 2026-03-24
+
+### ✨ New Features
+
+- **Video Overlay** — Composition grid overlay on `<video>` elements
+  - Independent toggle (default: off) — separate from image overlay
+  - Keyboard shortcut `Alt+V` to toggle video overlay
+  - Instant re-enable — grids appear immediately when toggling back on
+- **Separate Image & Video Controls** — "Enable Grid" renamed to "Image Overlay", fully independent toggles
+- **Updated Keyboard Shortcuts**:
+  - `Alt+I` — Toggle image overlay (was `Alt+G`)
+  - `Alt+V` — Toggle video overlay (new)
+  - `Alt+L` — Toggle line style (restored)
+  - `Alt+C` — Quick color toggle (unchanged)
+  - Removed: `Alt+G` (grid), `Alt+D` (dots)
+
+### 🐛 Bug Fixes
+
+- **TikTok compatibility** — Video overlay no longer breaks pages with `position: absolute` videos
+  - Separated `createImageOverlay` / `createVideoOverlay` to avoid modifying parent layout on absolute-positioned elements
+  - Removed `isolation: isolate` from video overlay to prevent stacking context issues
+
+### 🔧 Improvements
+
+- **Constants extraction** — Message types (`MSG`) and DOM constants (`ATTR`, `PENDING`, `CSS_OVERLAY_ROOT`) moved to dedicated files (`constants/messages.ts`, `constants/dom.ts`)
+- **Centralized event listeners** — `mousemove`/`scroll` listeners consolidated in `shared.ts` via `onInteraction` callback (reduced from 4 listeners to 2)
+- **Shared module architecture** — `shared.ts` provides state management, overlay helpers, and event system for both image and video modules
+- **Show Dots always visible** — Toggle is always shown regardless of overlay state; Dot Color/Size shown only when dots are enabled
+
+---
+
 ## v1.0.4 — 2026-03-23
 
 ### ✨ New Features

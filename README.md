@@ -10,7 +10,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/manifest-v3-blue" alt="Manifest V3" />
-  <img src="https://img.shields.io/badge/version-1.0.4-green" alt="Version" />
+  <img src="https://img.shields.io/badge/version-1.0.5-green" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License" />
   <img src="https://img.shields.io/badge/lang-EN%20%7C%20VI-blueviolet" alt="Languages" />
 </p>
@@ -27,9 +27,10 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 ## ✨ Features
 
 - 📐 **Four Grid Types** — Rule of Thirds, Golden Ratio, Fibonacci Spiral & Golden Triangle
+- 🎬 **Video Overlay** — Composition grid on `<video>` elements (independent toggle)
 - 🔴 **Intersection Dots** — Highlight power points with toggleable dots
 - 🎨 **Custom Colors** — Pick any color for grid lines and dots
-- ⌨️ **Keyboard Shortcuts** — `Alt+G` toggle grid, `Alt+D` toggle dots, `Alt+L` toggle line style, `Alt+C` quick color
+- ⌨️ **Keyboard Shortcuts** — `Alt+I` image overlay, `Alt+V` video overlay, `Alt+L` line style, `Alt+C` quick color
 - 🎯 **Quick Color Toggle** — Swap grid color between two customizable presets with a Shortcut
 - 🖱️ **Context Menu** — Right-click any image to toggle the grid overlay
 - 🌐 **Site Mode** — All Sites / Block List / Allow List — control where the grid appears
@@ -46,7 +47,7 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 3. The grid overlay automatically appears on detected images
 4. Use any of these methods to control the grid:
    - **Popup** — Click the extension icon to customize all settings
-   - **Keyboard** — Press `Alt+G` to quickly toggle grid on/off
+   - **Keyboard** — Press `Alt+I` to quickly toggle image overlay on/off
    - **Right-click** — Right-click any image to toggle the grid overlay
 5. Customize settings in the popup:
    - Toggle grid on/off
@@ -85,7 +86,12 @@ composition-grid/
 │   │       └── IntersectionDot.tsx # Intersection dot component
 │   ├── content/
 │   │   ├── index.ts            # Content script (image detection & injection)
+│   │   ├── video.ts            # Video overlay (detection & injection)
+│   │   ├── shared.ts           # Shared state, utilities & event system
 │   │   └── content.css         # Overlay positioning styles
+│   ├── constants/
+│   │   ├── messages.ts         # Message type constants
+│   │   └── dom.ts              # DOM-related constants
 │   ├── hooks/
 │   │   └── useSettings.ts     # Shared settings hook (debounced saves)
 │   ├── i18n/
@@ -160,7 +166,8 @@ npm run build:content
 
 | Setting | Description | Default |
 |---|---|---|
-| Enable Grid | Master on/off toggle | ✅ On |
+| Image Overlay | Toggle image grid on/off | ✅ On |
+| Video Overlay | Toggle video grid on/off | ❌ Off |
 | Show Dots | Toggle intersection point dots | ✅ On |
 | Grid Type | Rule of Thirds, Golden Ratio, Fibonacci Spiral, Triangle (multi-select) | Rule of Thirds, Triangle |
 | Spiral Direction | Fibonacci spiral orientation (↱ ↲ ↳ ↰) | ↱ Top-Left |
@@ -179,8 +186,8 @@ npm run build:content
 
 | Shortcut | Action |
 |---|---|
-| `Alt+G` | Toggle grid overlay on/off |
-| `Alt+D` | Toggle intersection dots |
+| `Alt+I` | Toggle image overlay on/off |
+| `Alt+V` | Toggle video overlay on/off |
 | `Alt+L` | Switch between solid and dashed lines |
 | `Alt+C` | Quick color toggle (swap both line and intersection dot colors between two presets) |
 
