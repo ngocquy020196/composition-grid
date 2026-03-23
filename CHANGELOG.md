@@ -8,10 +8,24 @@
   - Customizable color pair — pick any two colors in the popup (default: white ↔ black)
   - Toggles both line color and dot color simultaneously
 
+### 🐛 Bug Fixes
+
+- **Grid injection on lazy-loaded sites** — Fixed images not getting grids on sites like 35awards.com that swap `src` from placeholder to real URL via JavaScript
+- **Background-image photo support** — Fixed grid not appearing on lightbox images that use `src="spacer.gif"` + CSS `background-image` for the real photo
+- **Spacer image context menu** — Right-click now correctly finds the real image even when a spacer overlay intercepts the click
+- **Duplicate grid prevention** — Skip injection if the parent already has a grid overlay (e.g. lightbox with multiple `<img>` tags)
+- **Object-fit aware overlay** — Grid now correctly matches the visible photo area when images use `object-fit: contain/cover/scale-down`
+- **Stacking context isolation** — Grid overlays no longer escape above modal/lightbox backdrops using `isolation: isolate`
+
 ### 🔧 Improvements
 
 - **Better Color Swatch Visibility** — Increased border contrast on color pickers so dark colors are visible in dark mode
 - Added `--swatch-border` CSS variable for consistent swatch styling across themes
+- **MutationObserver watches `src` attribute** — Detects lazy-loaded images that swap their `src` dynamically
+- **Deferred injection** — `tryInjectOrDefer` waits for image `load` event when `shouldInject` fails due to incomplete loading
+- **Dimension guard** — `syncOverlayPosition` skips updates when image dimensions are zero
+- **Merged `getComputedStyle` calls** — Single call per `shouldInject` check instead of two
+- **ResizeObserver** — Grid overlay stays aligned when images resize (e.g. window resize in modals)
 
 ---
 

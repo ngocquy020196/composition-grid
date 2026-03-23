@@ -1,10 +1,7 @@
 /* Grid overlay — injected by content script */
 .cg-grid-overlay-root {
     position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
     pointer-events: none !important;
     z-index: 9999 !important;
+    box-sizing: border-box !important;
 }

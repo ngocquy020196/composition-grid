@@ -30,7 +30,7 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 - 🔴 **Intersection Dots** — Highlight power points with toggleable dots
 - 🎨 **Custom Colors** — Pick any color for grid lines and dots
 - ⌨️ **Keyboard Shortcuts** — `Alt+G` toggle grid, `Alt+D` toggle dots, `Alt+L` toggle line style, `Alt+C` quick color
-- 🎯 **Quick Color Toggle** — Swap grid color between two customizable presets with one keystroke
+- 🎯 **Quick Color Toggle** — Swap grid color between two customizable presets with a Shortcut
 - 🖱️ **Context Menu** — Right-click any image to toggle the grid overlay
 - 🌐 **Site Mode** — All Sites / Block List / Allow List — control where the grid appears
 - 🌗 **Dark / Light Theme** — Switch between dark and light interface
@@ -182,7 +182,7 @@ npm run build:content
 | `Alt+G` | Toggle grid overlay on/off |
 | `Alt+D` | Toggle intersection dots |
 | `Alt+L` | Switch between solid and dashed lines |
-| `Alt+C` | Quick color toggle (swap between two preset colors) |
+| `Alt+C` | Quick color toggle (swap both line and intersection dot colors between two presets) |
 
 You can customize these shortcuts at `chrome://extensions/shortcuts` or `edge://extensions/shortcuts`.
 
