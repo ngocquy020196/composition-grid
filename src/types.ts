@@ -21,6 +21,8 @@ export interface Settings {
     language: Language;
     spiralOrientation: SpiralOrientation;
     theme: Theme;
+    toggleColorA: string;
+    toggleColorB: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -39,4 +41,6 @@ export const DEFAULT_SETTINGS: Settings = {
     language: 'en',
     spiralOrientation: 0,
     theme: 'dark',
+    toggleColorA: '#ffffff',
+    toggleColorB: '#000000',
 };

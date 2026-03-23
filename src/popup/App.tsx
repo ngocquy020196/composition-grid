@@ -218,6 +218,44 @@ const App: React.FC = () => {
                 </div>
             </div>
 
+            {/* Quick Colors (Alt+C) */}
+            <div className="setting-row setting-row-quickcolor">
+                <div className="setting-row-top">
+                    <div className="setting-label-group">
+                        <span className="setting-label">{t('quickColor', lang)}</span>
+                        <span className="shortcut-hint">
+                            <kbd>Alt</kbd><span className="shortcut-plus">+</span><kbd>C</kbd>
+                        </span>
+                    </div>
+                    <div className="toggle-colors-picker">
+                        <div className="color-picker-wrapper">
+                            <div
+                                className="color-swatch"
+                                style={{ backgroundColor: settings.toggleColorA }}
+                            />
+                            <input
+                                type="color"
+                                value={settings.toggleColorA}
+                                onChange={(e) => update('toggleColorA', e.target.value)}
+                            />
+                        </div>
+                        <span className="toggle-colors-swap">⇄</span>
+                        <div className="color-picker-wrapper">
+                            <div
+                                className="color-swatch"
+                                style={{ backgroundColor: settings.toggleColorB }}
+                            />
+                            <input
+                                type="color"
+                                value={settings.toggleColorB}
+                                onChange={(e) => update('toggleColorB', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <p className="setting-hint">{t('quickColorHint', lang)}</p>
+            </div>
+
             {/* Min image size */}
             <div className="setting-row">
                 <span className="setting-label">{t('minImageSize', lang)}</span>

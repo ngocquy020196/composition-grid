@@ -92,6 +92,7 @@ chrome.commands.onCommand.addListener((command) => {
         'toggle-grid': 'TOGGLE_GRID_ALL',
         'toggle-dots': 'TOGGLE_DOTS',
         'toggle-line-style': 'TOGGLE_LINE_STYLE',
+        'toggle-color': 'TOGGLE_COLOR',
     };
 
     const type = messageMap[command];

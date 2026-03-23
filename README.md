@@ -10,7 +10,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/manifest-v3-blue" alt="Manifest V3" />
-  <img src="https://img.shields.io/badge/version-1.0.3-green" alt="Version" />
+  <img src="https://img.shields.io/badge/version-1.0.4-green" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License" />
   <img src="https://img.shields.io/badge/lang-EN%20%7C%20VI-blueviolet" alt="Languages" />
 </p>
@@ -29,7 +29,8 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 - 📐 **Four Grid Types** — Rule of Thirds, Golden Ratio, Fibonacci Spiral & Golden Triangle
 - 🔴 **Intersection Dots** — Highlight power points with toggleable dots
 - 🎨 **Custom Colors** — Pick any color for grid lines and dots
-- ⌨️ **Keyboard Shortcuts** — `Alt+G` toggle grid, `Alt+D` toggle dots, `Alt+L` toggle line style
+- ⌨️ **Keyboard Shortcuts** — `Alt+G` toggle grid, `Alt+D` toggle dots, `Alt+L` toggle line style, `Alt+C` quick color
+- 🎯 **Quick Color Toggle** — Swap grid color between two customizable presets with a Shortcut
 - 🖱️ **Context Menu** — Right-click any image to toggle the grid overlay
 - 🌐 **Site Mode** — All Sites / Block List / Allow List — control where the grid appears
 - 🌗 **Dark / Light Theme** — Switch between dark and light interface
@@ -171,6 +172,7 @@ npm run build:content
 | Skip Small Images | Minimum image size to show grid (50–500px) | `200px` |
 | Site Mode | All Sites / Block List / Allow List | All Sites |
 | Theme | Dark or Light interface | Dark |
+| Quick Color | Two preset colors for quick toggle (`Alt+C`) | `#ffffff` ↔ `#000000` |
 | Language | English or Vietnamese | English |
 
 ## ⌨️ Keyboard Shortcuts
@@ -180,6 +182,7 @@ npm run build:content
 | `Alt+G` | Toggle grid overlay on/off |
 | `Alt+D` | Toggle intersection dots |
 | `Alt+L` | Switch between solid and dashed lines |
+| `Alt+C` | Quick color toggle (swap both line and intersection dot colors between two presets) |
 
 You can customize these shortcuts at `chrome://extensions/shortcuts` or `edge://extensions/shortcuts`.
 
