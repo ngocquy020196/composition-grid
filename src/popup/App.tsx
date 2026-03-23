@@ -43,18 +43,18 @@ const App: React.FC = () => {
                 </div>
             </header>
 
-            {/* Enable grid toggle */}
+            {/* Image Overlay toggle */}
             <div className="setting-row toggle-row">
                 <div className="setting-label-group">
                     <span className="setting-label">{t('enableGrid', lang)}</span>
                     <span className="shortcut-hint">
-                        <kbd>Alt</kbd><span className="shortcut-plus">+</span><kbd>G</kbd>
+                        <kbd>Alt</kbd><span className="shortcut-plus">+</span><kbd>I</kbd>
                     </span>
                 </div>
                 <button
                     className={`toggle-btn ${settings.enabled ? 'active' : ''}`}
                     onClick={() => update('enabled', !settings.enabled)}
-                    aria-label="Toggle grid"
+                    aria-label="Toggle image overlay"
                 >
                     <span className="toggle-knob" />
                     <span className="toggle-text">
@@ -63,27 +63,40 @@ const App: React.FC = () => {
                 </button>
             </div>
 
-            {/* Show dots toggle */}
-            {settings.enabled && (
-                <div className="setting-row toggle-row">
-                    <div className="setting-label-group">
-                        <span className="setting-label">{t('showDots', lang)}</span>
-                        <span className="shortcut-hint">
-                            <kbd>Alt</kbd><span className="shortcut-plus">+</span><kbd>D</kbd>
-                        </span>
-                    </div>
-                    <button
-                        className={`toggle-btn ${settings.showDots ? 'active' : ''}`}
-                        onClick={() => update('showDots', !settings.showDots)}
-                        aria-label="Toggle dots"
-                    >
-                        <span className="toggle-knob" />
-                        <span className="toggle-text">
-                            {settings.showDots ? t('enabled', lang) : t('disabled', lang)}
-                        </span>
-                    </button>
+            {/* Video Overlay toggle */}
+            <div className="setting-row toggle-row">
+                <div className="setting-label-group">
+                    <span className="setting-label">{t('videoEnabled', lang)}</span>
+                    <span className="shortcut-hint">
+                        <kbd>Alt</kbd><span className="shortcut-plus">+</span><kbd>V</kbd>
+                    </span>
                 </div>
-            )}
+                <button
+                    className={`toggle-btn ${settings.videoEnabled ? 'active' : ''}`}
+                    onClick={() => update('videoEnabled', !settings.videoEnabled)}
+                    aria-label="Toggle video overlay"
+                >
+                    <span className="toggle-knob" />
+                    <span className="toggle-text">
+                        {settings.videoEnabled ? t('enabled', lang) : t('disabled', lang)}
+                    </span>
+                </button>
+            </div>
+
+            {/* Show dots toggle */}
+            <div className="setting-row toggle-row">
+                <span className="setting-label">{t('showDots', lang)}</span>
+                <button
+                    className={`toggle-btn ${settings.showDots ? 'active' : ''}`}
+                    onClick={() => update('showDots', !settings.showDots)}
+                    aria-label="Toggle dots"
+                >
+                    <span className="toggle-knob" />
+                    <span className="toggle-text">
+                        {settings.showDots ? t('enabled', lang) : t('disabled', lang)}
+                    </span>
+                </button>
+            </div>
             <div className="divider" />
 
             {/* Grid type (multi-select) */}
