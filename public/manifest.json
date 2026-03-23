@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Composition Grid: Rule of Thirds, Golden Ratio & More",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Overlay composition grids on any image: Rule of Thirds, Golden Ratio, Fibonacci Spiral & Triangle guides.",
     "permissions": [
         "storage",
@@ -42,17 +42,17 @@
     "commands": {
         "toggle-grid": {
             "suggested_key": {
-                "default": "Alt+G",
-                "mac": "Alt+G"
+                "default": "Alt+I",
+                "mac": "Alt+I"
             },
-            "description": "Toggle composition grid overlay"
+            "description": "Toggle image overlay"
         },
-        "toggle-dots": {
+        "toggle-video": {
             "suggested_key": {
-                "default": "Alt+D",
-                "mac": "Alt+D"
+                "default": "Alt+V",
+                "mac": "Alt+V"
             },
-            "description": "Toggle intersection dots"
+            "description": "Toggle video overlay"
         },
         "toggle-line-style": {
             "suggested_key": {

@@ -3,6 +3,7 @@
 
 import { t } from '../i18n';
 import { Language } from '../types';
+import { MSG } from '../constants/messages';
 
 const MENU_ID = 'toggle-grid';
 
@@ -63,10 +64,34 @@ chrome.storage.onChanged.addListener((changes) => {
     }
 });
 
-// Update context menu visibility when switching tabs
+// Update context menu visibility when switching tabs + notify content scripts
+let previousTabId: number | undefined;
+
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    // Deactivate grid on the previous tab
+    if (previousTabId !== undefined) {
+        chrome.tabs.sendMessage(previousTabId, { type: MSG.TAB_DEACTIVATED }).catch(() => {});
+    }
+
+    // Activate grid on the new tab
+    previousTabId = activeInfo.tabId;
+    chrome.tabs.sendMessage(activeInfo.tabId, { type: MSG.TAB_ACTIVATED }).catch(() => {});
+
     const tab = await chrome.tabs.get(activeInfo.tabId);
     updateMenuVisibility(tab);
+});
+
+// When a window gains focus, activate its current tab
+chrome.windows.onFocusChanged.addListener((windowId) => {
+    if (windowId === chrome.windows.WINDOW_ID_NONE) return;
+    chrome.tabs.query({ active: true, windowId }, (tabs) => {
+        if (!tabs[0]?.id) return;
+        if (previousTabId !== undefined && previousTabId !== tabs[0].id) {
+            chrome.tabs.sendMessage(previousTabId, { type: MSG.TAB_DEACTIVATED }).catch(() => {});
+        }
+        previousTabId = tabs[0].id;
+        chrome.tabs.sendMessage(tabs[0].id, { type: MSG.TAB_ACTIVATED }).catch(() => {});
+    });
 });
 
 // Update context menu visibility when page loads
@@ -81,7 +106,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId !== MENU_ID || !tab?.id) return;
 
     chrome.tabs.sendMessage(tab.id, {
-        type: 'TOGGLE_GRID',
+        type: MSG.TOGGLE_GRID,
         srcUrl: info.srcUrl,
     }).catch(() => { /* content script not loaded on this tab */ });
 });
@@ -89,10 +114,10 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 // Keyboard shortcut handler
 chrome.commands.onCommand.addListener((command) => {
     const messageMap: Record<string, string> = {
-        'toggle-grid': 'TOGGLE_GRID_ALL',
-        'toggle-dots': 'TOGGLE_DOTS',
-        'toggle-line-style': 'TOGGLE_LINE_STYLE',
-        'toggle-color': 'TOGGLE_COLOR',
+        'toggle-grid': MSG.TOGGLE_GRID_ALL,
+        'toggle-video': MSG.TOGGLE_VIDEO,
+        'toggle-line-style': MSG.TOGGLE_LINE_STYLE,
+        'toggle-color': MSG.TOGGLE_COLOR,
     };
 
     const type = messageMap[command];
