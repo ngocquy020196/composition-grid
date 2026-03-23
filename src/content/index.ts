@@ -1,12 +1,18 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
-import GridOverlay from '../components/GridOverlay';
-import { Settings, DEFAULT_SETTINGS } from '../types';
-import { getSettings, onSettingsChanged } from '../utils/storage';
+import {
+    ATTR, PENDING,
+    getState, isVisibleInDOM, calcObjectFitBounds,
+    renderGridElement, createImageOverlay,
+    onRenderAll, onNavigate, onInteraction, initShared,
+} from './shared';
+import { MSG } from '../constants/messages';
+import './video'; // Video grid support (self-contained)
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+// Common avatar/thumbnail indicators in class names, alt text, or src
+const SKIP_PATTERNS = /avatar|icon|thumb|logo|badge|emoji|profile[-_]?(?:pic|img|photo)|favicon/i;
 
 // ─── State ───────────────────────────────────────────────────────────────────
-let currentSettings: Settings = { ...DEFAULT_SETTINGS };
-
 interface InjectedEntry {
     img: HTMLImageElement;
     container: HTMLElement;
@@ -17,14 +23,9 @@ interface InjectedEntry {
 
 const injectedMap = new Map<HTMLImageElement, InjectedEntry>();
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-const ATTR = 'data-grid-injected';
-
-// Common avatar/thumbnail indicators in class names, alt text, or src
-const SKIP_PATTERNS = /avatar|icon|thumb|logo|badge|emoji|profile[-_]?(?:pic|img|photo)|favicon/i;
-
 // ─── Rendering ───────────────────────────────────────────────────────────────
-function renderOverlay(entry: InjectedEntry, settings: Settings) {
+function renderOverlay(entry: InjectedEntry) {
+    const { settings } = getState();
     if (!settings.enabled) {
         entry.overlayDiv.style.display = 'none';
         entry.resizeObserver?.disconnect();
@@ -32,22 +33,22 @@ function renderOverlay(entry: InjectedEntry, settings: Settings) {
     }
     entry.overlayDiv.style.display = '';
     entry.resizeObserver?.observe(entry.img);
-    entry.root.render(
-        React.createElement(GridOverlay, {
-            gridTypes: settings.gridTypes,
-            lineColor: settings.lineColor,
-            dotColor: settings.dotColor,
-            showDots: settings.showDots,
-            dotSize: settings.dotSize,
-            lineSize: settings.lineSize,
-            lineStyle: settings.lineStyle,
-            spiralOrientation: settings.spiralOrientation,
-        })
-    );
+    renderGridElement(entry.root, settings);
 }
 
 function renderAllOverlays() {
-    injectedMap.forEach((entry) => renderOverlay(entry, currentSettings));
+    injectedMap.forEach((entry) => renderOverlay(entry));
+}
+
+// Register with shared event system
+onRenderAll(renderAllOverlays);
+onNavigate(rescanImages);
+onInteraction(rescanImages);
+
+function rescanImages() {
+    document.querySelectorAll<HTMLImageElement>(
+        `img:not([${ATTR}]):not([${PENDING}])`
+    ).forEach(tryInjectOrDefer);
 }
 
 // ─── Cleanup Helper ──────────────────────────────────────────────────────────
@@ -66,19 +67,10 @@ function cleanupImage(img: HTMLImageElement) {
 }
 
 // ─── Injection ───────────────────────────────────────────────────────────────
-function isVisibleInDOM(el: HTMLElement): boolean {
-    // checkVisibility traverses ancestors natively — much faster than JS loop
-    if (typeof el.checkVisibility === 'function') {
-        return el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
-    }
-    // Fallback for older browsers
-    const style = window.getComputedStyle(el);
-    return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity) !== 0;
-}
-
 function shouldInject(img: HTMLImageElement): boolean {
     if (img.getAttribute(ATTR) === 'true') return false;
-    const minSize = currentSettings.minImageSize;
+    const { settings } = getState();
+    const minSize = settings.minImageSize;
 
     // Cheap size check first — filters out most images before expensive calls
     if (img.width < minSize || img.height < minSize) return false;
@@ -114,56 +106,9 @@ function shouldInject(img: HTMLImageElement): boolean {
     return true;
 }
 
-// Calculate the actual visible image bounds, accounting for object-fit
-function getVisibleImageBounds(img: HTMLImageElement) {
-    const elW = img.offsetWidth;
-    const elH = img.offsetHeight;
-    const natW = img.naturalWidth;
-    const natH = img.naturalHeight;
-
-    // If natural dimensions are unknown, fall back to element bounds
-    if (!natW || !natH || !elW || !elH) {
-        return { left: img.offsetLeft, top: img.offsetTop, width: elW, height: elH };
-    }
-
-    const objectFit = window.getComputedStyle(img).objectFit || 'fill';
-    let renderW = elW;
-    let renderH = elH;
-
-    if (objectFit === 'contain' || objectFit === 'scale-down') {
-        const natRatio = natW / natH;
-        const elRatio = elW / elH;
-        if (natRatio > elRatio) {
-            // Width-constrained
-            renderW = elW;
-            renderH = elW / natRatio;
-        } else {
-            // Height-constrained
-            renderH = elH;
-            renderW = elH * natRatio;
-        }
-    } else if (objectFit === 'cover') {
-        const natRatio = natW / natH;
-        const elRatio = elW / elH;
-        if (natRatio > elRatio) {
-            renderH = elH;
-            renderW = elH * natRatio;
-        } else {
-            renderW = elW;
-            renderH = elW / natRatio;
-        }
-    }
-    // For 'fill' or 'none', renderW/renderH stays as elW/elH
-
-    const left = img.offsetLeft + (elW - renderW) / 2;
-    const top = img.offsetTop + (elH - renderH) / 2;
-
-    return { left, top, width: renderW, height: renderH };
-}
-
 // Position the overlay to exactly match the image's visible area
 function syncOverlayPosition(img: HTMLImageElement, overlayDiv: HTMLDivElement) {
-    const bounds = getVisibleImageBounds(img);
+    const bounds = calcObjectFitBounds(img, img.naturalWidth, img.naturalHeight);
     if (bounds.width <= 0 || bounds.height <= 0) return;
     overlayDiv.style.left = `${bounds.left}px`;
     overlayDiv.style.top = `${bounds.top}px`;
@@ -172,31 +117,14 @@ function syncOverlayPosition(img: HTMLImageElement, overlayDiv: HTMLDivElement) 
 }
 
 function injectGrid(img: HTMLImageElement) {
+    const { tabActive } = getState();
+    if (!tabActive) return;
     if (!shouldInject(img)) return;
 
+    const overlayDiv = createImageOverlay(img);
+    if (!overlayDiv) return;
+
     img.setAttribute(ATTR, 'true');
-
-    // Instead of wrapping the image (which breaks Instagram/social media layouts),
-    // we make the image's parent position:relative and inject the overlay as a sibling.
-    const parent = img.parentElement;
-    if (!parent) return;
-
-    // Skip if this parent already has a grid overlay (e.g. lightbox with multiple img tags)
-    if (parent.querySelector('.cg-grid-overlay-root')) return;
-
-    // Ensure the parent is a positioning context
-    const parentPosition = window.getComputedStyle(parent).position;
-    if (parentPosition === 'static') {
-        parent.style.position = 'relative';
-    }
-
-    // Create a stacking context so the overlay's z-index doesn't escape above modals
-    parent.style.isolation = 'isolate';
-
-    // Create overlay root as a sibling of the image
-    const overlayDiv = document.createElement('div');
-    overlayDiv.className = 'cg-grid-overlay-root';
-    parent.appendChild(overlayDiv);
 
     // Position overlay to match image bounds (not parent bounds)
     syncOverlayPosition(img, overlayDiv);
@@ -210,15 +138,13 @@ function injectGrid(img: HTMLImageElement) {
     resizeObserver.observe(img);
 
     const root = ReactDOM.createRoot(overlayDiv);
-    const entry: InjectedEntry = { img, container: parent, root, overlayDiv, resizeObserver };
+    const entry: InjectedEntry = { img, container: img.parentElement!, root, overlayDiv, resizeObserver };
 
     injectedMap.set(img, entry);
-    renderOverlay(entry, currentSettings);
+    renderOverlay(entry);
 }
 
 // ─── IntersectionObserver ────────────────────────────────────────────────────
-const PENDING = 'data-grid-pending';
-
 function tryInjectOrDefer(img: HTMLImageElement) {
     if (img.getAttribute(ATTR) === 'true') return;
     if (img.getAttribute(PENDING) === 'true') return;
@@ -240,7 +166,8 @@ function tryInjectOrDefer(img: HTMLImageElement) {
 
     // Image is loaded but has zero/small dimensions (e.g. React lightbox animation).
     // Watch for resize and retry once it reaches visible size.
-    const minSize = currentSettings.minImageSize;
+    const { settings } = getState();
+    const minSize = settings.minImageSize;
     if (img.width < minSize || img.height < minSize) {
         img.setAttribute(PENDING, 'true');
         const ro = new ResizeObserver(() => {
@@ -262,7 +189,10 @@ const intersectionObserver = new IntersectionObserver(
             if (entry.isIntersecting) {
                 const img = entry.target as HTMLImageElement;
                 tryInjectOrDefer(img);
-                intersectionObserver.unobserve(img);
+                // Only stop observing if injection succeeded or a retry is pending
+                if (img.getAttribute(ATTR) === 'true' || img.getAttribute(PENDING) === 'true') {
+                    intersectionObserver.unobserve(img);
+                }
             }
         }
     },
@@ -277,8 +207,8 @@ function observeImage(img: HTMLImageElement) {
 // ─── MutationObserver ────────────────────────────────────────────────────────
 const mutationObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
-        // Handle src attribute changes (lazy-loading sites swap src from placeholder to real URL)
-        if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+        // Handle lazy-load attribute changes (src, srcset, data-src, class)
+        if (mutation.type === 'attributes') {
             const target = mutation.target;
             if (!(target instanceof HTMLImageElement)) continue;
             if (target.getAttribute(ATTR) === 'true') continue;
@@ -318,44 +248,9 @@ const mutationObserver = new MutationObserver((mutations) => {
     }
 });
 
-// ─── Context Menu Message Handler ────────────────────────────────────────────
+// ─── Context Menu Message Handler (image-specific) ───────────────────────────
 chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }) => {
-    // Keyboard shortcut: toggle all grids on the page
-    if (message.type === 'TOGGLE_GRID_ALL') {
-        currentSettings.enabled = !currentSettings.enabled;
-        renderAllOverlays();
-        chrome.storage.sync.set({ enabled: currentSettings.enabled });
-        return;
-    }
-
-    // Keyboard shortcut: toggle dots
-    if (message.type === 'TOGGLE_DOTS') {
-        currentSettings.showDots = !currentSettings.showDots;
-        renderAllOverlays();
-        chrome.storage.sync.set({ showDots: currentSettings.showDots });
-        return;
-    }
-
-    // Keyboard shortcut: toggle line style (solid ↔ dashed)
-    if (message.type === 'TOGGLE_LINE_STYLE') {
-        currentSettings.lineStyle = currentSettings.lineStyle === 'solid' ? 'dashed' : 'solid';
-        renderAllOverlays();
-        chrome.storage.sync.set({ lineStyle: currentSettings.lineStyle });
-        return;
-    }
-
-    // Keyboard shortcut: toggle color (colorA ↔ colorB)
-    if (message.type === 'TOGGLE_COLOR') {
-        const { toggleColorA, toggleColorB } = currentSettings;
-        const newColor = currentSettings.lineColor === toggleColorA ? toggleColorB : toggleColorA;
-        currentSettings.lineColor = newColor;
-        currentSettings.dotColor = newColor;
-        renderAllOverlays();
-        chrome.storage.sync.set({ lineColor: newColor, dotColor: newColor });
-        return;
-    }
-
-    if (message.type !== 'TOGGLE_GRID' || !message.srcUrl) return;
+    if (message.type !== MSG.TOGGLE_GRID || !message.srcUrl) return;
 
     // Find the image by its src URL
     const images = document.querySelectorAll<HTMLImageElement>('img');
@@ -384,26 +279,21 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
     {
         const img = targetImg;
         const entry = injectedMap.get(img);
+        const { settings } = getState();
 
         if (entry) {
-            // Already injected — check if it's visible or hidden
-            const isHidden = !currentSettings.enabled;
-
+            const isHidden = !settings.enabled;
             if (isHidden) {
-                // Grid was injected but hidden (enabled=false) → enable and show
-                currentSettings.enabled = true;
+                // Grid was injected but hidden → enable and show
                 chrome.storage.sync.set({ enabled: true });
-                renderAllOverlays();
             } else {
                 // Grid is visible → remove it
                 cleanupImage(img);
             }
         } else {
             // Not injected yet → enable and inject
-            if (!currentSettings.enabled) {
-                currentSettings.enabled = true;
+            if (!settings.enabled) {
                 chrome.storage.sync.set({ enabled: true });
-                renderAllOverlays();
             }
             injectGrid(img);
         }
@@ -412,44 +302,22 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
 
 // ─── Initialization ──────────────────────────────────────────────────────────
 async function init() {
-    // Load settings
-    currentSettings = await getSettings();
-
-    // Check site mode — decide if grid should run on this site
-    const currentHost = window.location.hostname;
-
-    if (currentSettings.siteMode === 'block') {
-        const blocked = currentSettings.blockList.some((site: string) => currentHost.includes(site));
-        if (blocked) return;
-    }
-    if (currentSettings.siteMode === 'allow') {
-        const allowed = currentSettings.allowList.some((site: string) => currentHost.includes(site));
-        if (!allowed) return;
-    }
-
-    // Listen for settings changes (debounced to avoid double render from shortcut handlers)
-    let settingsTimer: ReturnType<typeof setTimeout>;
-    onSettingsChanged((newSettings) => {
-        clearTimeout(settingsTimer);
-        settingsTimer = setTimeout(() => {
-            currentSettings = newSettings;
-            renderAllOverlays();
-        }, 100);
-    });
+    const allowed = await initShared();
+    if (!allowed) return;
 
     // Process existing images via IntersectionObserver
     const existingImages = document.querySelectorAll<HTMLImageElement>('img');
     existingImages.forEach(observeImage);
 
-    // Watch for new images and src attribute changes (lazy loading)
+    // Watch for new images and lazy-load attribute changes
     mutationObserver.observe(document.body, {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['src'],
+        attributeFilter: ['src', 'srcset', 'data-src', 'data-lazy-src', 'data-original', 'class'],
     });
+
 }
 
 // Start
 init();
-
