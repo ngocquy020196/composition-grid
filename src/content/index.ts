@@ -27,9 +27,11 @@ const SKIP_PATTERNS = /avatar|icon|thumb|logo|badge|emoji|profile[-_]?(?:pic|img
 function renderOverlay(entry: InjectedEntry, settings: Settings) {
     if (!settings.enabled) {
         entry.overlayDiv.style.display = 'none';
+        entry.resizeObserver?.disconnect();
         return;
     }
     entry.overlayDiv.style.display = '';
+    entry.resizeObserver?.observe(entry.img);
     entry.root.render(
         React.createElement(GridOverlay, {
             gridTypes: settings.gridTypes,
@@ -64,31 +66,27 @@ function cleanupImage(img: HTMLImageElement) {
 }
 
 // ─── Injection ───────────────────────────────────────────────────────────────
-function isElementVisible(el: HTMLElement): boolean {
-    const style = window.getComputedStyle(el);
-    if (style.display === 'none') return false;
-    if (style.visibility === 'hidden') return false;
-    if (parseFloat(style.opacity) === 0) return false;
-    return true;
-}
-
 function isVisibleInDOM(el: HTMLElement): boolean {
-    let current: HTMLElement | null = el;
-    while (current) {
-        if (!isElementVisible(current)) return false;
-        current = current.parentElement;
+    // checkVisibility traverses ancestors natively — much faster than JS loop
+    if (typeof el.checkVisibility === 'function') {
+        return el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
     }
-    return true;
+    // Fallback for older browsers
+    const style = window.getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity) !== 0;
 }
 
 function shouldInject(img: HTMLImageElement): boolean {
     if (img.getAttribute(ATTR) === 'true') return false;
     const minSize = currentSettings.minImageSize;
 
+    // Cheap size check first — filters out most images before expensive calls
+    if (img.width < minSize || img.height < minSize) return false;
+
     // Skip hidden images (display:none, visibility:hidden, opacity:0)
     if (!isVisibleInDOM(img)) return false;
 
-    // Size checks — skip small images
+    // Size checks — skip small natural dimensions
     // Some sites use spacer.gif with background-image for the real photo.
     // Only filter by natural dimensions if there's no background-image.
     const style = window.getComputedStyle(img);
@@ -97,7 +95,6 @@ function shouldInject(img: HTMLImageElement): boolean {
         if (img.naturalWidth > 0 && img.naturalWidth < minSize) return false;
         if (img.naturalHeight > 0 && img.naturalHeight < minSize) return false;
     }
-    if (img.width < minSize || img.height < minSize) return false;
 
     // Skip tiny data URIs (inline icons)
     const src = img.src || '';
@@ -204,8 +201,12 @@ function injectGrid(img: HTMLImageElement) {
     // Position overlay to match image bounds (not parent bounds)
     syncOverlayPosition(img, overlayDiv);
 
-    // Keep overlay aligned when image resizes (e.g. modal/lightbox window resize)
-    const resizeObserver = new ResizeObserver(() => syncOverlayPosition(img, overlayDiv));
+    // Keep overlay aligned when image resizes — debounced to avoid jank during animations
+    let rafId = 0;
+    const resizeObserver = new ResizeObserver(() => {
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => syncOverlayPosition(img, overlayDiv));
+    });
     resizeObserver.observe(img);
 
     const root = ReactDOM.createRoot(overlayDiv);
@@ -260,10 +261,11 @@ const mutationObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
         // Handle src attribute changes (lazy-loading sites swap src from placeholder to real URL)
         if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
-            const img = mutation.target as HTMLImageElement;
-            if (img.tagName === 'IMG' && img.getAttribute(ATTR) !== 'true') {
-                tryInjectOrDefer(img);
-            }
+            const target = mutation.target;
+            if (!(target instanceof HTMLImageElement)) continue;
+            if (target.getAttribute(ATTR) === 'true') continue;
+            if (target.getAttribute(PENDING) === 'true') continue;
+            tryInjectOrDefer(target);
             continue;
         }
 
@@ -303,24 +305,24 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
     // Keyboard shortcut: toggle all grids on the page
     if (message.type === 'TOGGLE_GRID_ALL') {
         currentSettings.enabled = !currentSettings.enabled;
-        chrome.storage.sync.set({ enabled: currentSettings.enabled });
         renderAllOverlays();
+        chrome.storage.sync.set({ enabled: currentSettings.enabled });
         return;
     }
 
     // Keyboard shortcut: toggle dots
     if (message.type === 'TOGGLE_DOTS') {
         currentSettings.showDots = !currentSettings.showDots;
-        chrome.storage.sync.set({ showDots: currentSettings.showDots });
         renderAllOverlays();
+        chrome.storage.sync.set({ showDots: currentSettings.showDots });
         return;
     }
 
     // Keyboard shortcut: toggle line style (solid ↔ dashed)
     if (message.type === 'TOGGLE_LINE_STYLE') {
         currentSettings.lineStyle = currentSettings.lineStyle === 'solid' ? 'dashed' : 'solid';
-        chrome.storage.sync.set({ lineStyle: currentSettings.lineStyle });
         renderAllOverlays();
+        chrome.storage.sync.set({ lineStyle: currentSettings.lineStyle });
         return;
     }
 
@@ -330,8 +332,8 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
         const newColor = currentSettings.lineColor === toggleColorA ? toggleColorB : toggleColorA;
         currentSettings.lineColor = newColor;
         currentSettings.dotColor = newColor;
-        chrome.storage.sync.set({ lineColor: newColor, dotColor: newColor });
         renderAllOverlays();
+        chrome.storage.sync.set({ lineColor: newColor, dotColor: newColor });
         return;
     }
 
@@ -407,10 +409,14 @@ async function init() {
         if (!allowed) return;
     }
 
-    // Listen for settings changes
+    // Listen for settings changes (debounced to avoid double render from shortcut handlers)
+    let settingsTimer: ReturnType<typeof setTimeout>;
     onSettingsChanged((newSettings) => {
-        currentSettings = newSettings;
-        renderAllOverlays();
+        clearTimeout(settingsTimer);
+        settingsTimer = setTimeout(() => {
+            currentSettings = newSettings;
+            renderAllOverlays();
+        }, 100);
     });
 
     // Process existing images via IntersectionObserver

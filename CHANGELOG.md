@@ -27,6 +27,15 @@
 - **Merged `getComputedStyle` calls** — Single call per `shouldInject` check instead of two
 - **ResizeObserver** — Grid overlay stays aligned when images resize (e.g. window resize in modals)
 
+### ⚡ Performance
+
+- **Native visibility check** — Replaced JS ancestor traversal with `checkVisibility()` API
+- **Debounced ResizeObserver** — Uses `requestAnimationFrame` to batch resize events
+- **Eliminated double rendering** — Shortcut handlers no longer trigger redundant re-renders via `onSettingsChanged`
+- **Optimized check order** — Cheap size check runs before expensive visibility/style checks in `shouldInject`
+- **Smart ResizeObserver lifecycle** — Disconnected when grid is hidden, reconnected when shown
+- **MutationObserver guards** — Skips already-injected and pending images on `src` attribute changes
+
 ---
 
 ## v1.0.3 — 2026-03-22
