@@ -26,27 +26,53 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build popup
-        run: npm run build:popup
+      # ── Build Chrome/Edge ──
+      - name: Build Chrome/Edge
+        run: npm run build
 
-      - name: Build content script
-        run: npm run build:content
-
-      - name: Upload extension artifact
+      - name: Upload Chrome artifact
         uses: actions/upload-artifact@v4
         with:
-          name: composition-grid-extension
+          name: composition-grid-chrome
           path: dist/
           retention-days: 30
 
-      - name: Package extension as zip
+      # ── Build Firefox ──
+      - name: Build Firefox
+        run: node scripts/build-firefox.js
+
+      - name: Upload Firefox artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: composition-grid-firefox
+          path: dist-firefox/
+          retention-days: 30
+
+      # ── Release (on tag push only) ──
+      - name: Package Chrome zip
         if: startsWith(github.ref, 'refs/tags/v')
         run: cd dist && zip -r ../composition-grid-${{ github.ref_name }}.zip .
+
+      - name: Package Firefox zip
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: cd dist-firefox && zip -r ../composition-grid-firefox-${{ github.ref_name }}.zip .
+
+      - name: Extract changelog for this version
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: changelog
+        run: |
+          VERSION="${{ github.ref_name }}"
+          # Extract content between this version header and the next --- separator
+          BODY=$(sed -n "/^## ${VERSION}/,/^---$/p" CHANGELOG.md | sed '1d;$d')
+          # Write to file for multi-line support
+          echo "$BODY" > release-notes.md
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          name: Composition Grid ${{ github.ref_name }}
-          generate_release_notes: true
-          files: composition-grid-${{ github.ref_name }}.zip
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: |
+            composition-grid-${{ github.ref_name }}.zip
+            composition-grid-firefox-${{ github.ref_name }}.zip
