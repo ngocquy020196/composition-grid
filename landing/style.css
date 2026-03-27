@@ -280,21 +280,36 @@ body {
     transform: translateY(-2px);
 }
 
+.btn-firefox {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.btn-firefox:hover {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+}
+
 /* Active browser button — gradient + glow */
-.btn-active.btn-edge {
+.btn-active.btn-edge,
+.btn-active.btn-firefox {
     background: var(--accent-gradient);
     color: #fff;
     border: none;
     box-shadow: 0 4px 20px rgba(167, 139, 250, 0.3);
 }
 
-.btn-active.btn-edge:hover {
+.btn-active.btn-edge:hover,
+.btn-active.btn-firefox:hover {
     box-shadow: 0 6px 30px rgba(167, 139, 250, 0.45);
 }
 
-/* When btn-active exists, make the other button subtle */
+/* When btn-active exists, make the other buttons subtle */
 .btn-active ~ .btn-chrome:not(.btn-active),
 .btn-active ~ .btn-edge:not(.btn-active),
+.btn-active ~ .btn-firefox:not(.btn-active),
 .btn-chrome:not(.btn-active):has(~ .btn-active) {
     background: rgba(255, 255, 255, 0.07);
     color: var(--text);

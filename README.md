@@ -18,11 +18,12 @@
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/composition-grid-rule-of/jogbipaobeabiebmceafacioemlincdl"><img src="https://img.shields.io/badge/Chrome-Install-4285F4?logo=googlechrome&logoColor=white" alt="Chrome Web Store" /></a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/keaefbocibpijkfgjlbcdlgahplmekof"><img src="https://img.shields.io/badge/Edge-Install-0078D7?logo=microsoftedge&logoColor=white" alt="Edge Add-ons" /></a>
+  <a href="https://addons.mozilla.org/firefox/addon/composition-grid/"><img src="https://img.shields.io/badge/Firefox-Install-FF7139?logo=firefox&logoColor=white" alt="Firefox Add-ons" /></a>
 </p>
 
 ---
 
-A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**, **Golden Ratio**, **Fibonacci Spiral**, and **Golden Triangle** composition grids directly onto images on any website. Perfect for photographers, designers, and visual artists who want to analyze compositional balance without leaving the browser.
+A lightweight Chrome, Edge & Firefox extension that overlays **Rule of Thirds**, **Golden Ratio**, **Fibonacci Spiral**, and **Golden Triangle** composition grids directly onto images on any website. Perfect for photographers, designers, and visual artists who want to analyze compositional balance without leaving the browser.
 
 ## ✨ Features
 
@@ -38,7 +39,7 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 - ⚙️ **Options Page** — Dedicated settings page with site management
 - 🌍 **Bilingual** — English & Vietnamese (Tiếng Việt)
 - ⚡ **High Performance** — Uses IntersectionObserver & MutationObserver for efficient image detection
-- 🧩 **Manifest V3** — Built with the latest Chrome & Edge extension standard
+- 🧩 **Manifest V3** — Built with the latest Chrome, Edge & Firefox extension standard
 
 ## 📸 How It Works
 
@@ -64,7 +65,7 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 | **Vite** | Fast build tooling |
 | **React 19** | Popup UI & overlay components |
 | **TypeScript** | Type-safe codebase |
-| **Chrome & Edge Extension Manifest V3** | Extension platform |
+| **Manifest V3** | Chrome, Edge & Firefox extension platform |
 
 ## 📁 Project Structure
 
@@ -72,7 +73,7 @@ A lightweight Chrome & Microsoft Edge extension that overlays **Rule of Thirds**
 composition-grid/
 ├── public/
 │   ├── icons/                  # Extension icons (16, 48, 128px)
-│   └── manifest.json           # Extension manifest (Chrome & Edge)
+│   └── manifest.json           # Extension manifest (Chrome & Edge — Firefox generated at build)
 ├── src/
 │   ├── background/
 │   │   └── index.ts            # Service worker (context menu & keyboard shortcuts)
@@ -110,6 +111,8 @@ composition-grid/
 ├── landing/                    # Landing page (static HTML/CSS)
 ├── popup.html                  # Popup HTML shell
 ├── options.html                # Options page HTML shell
+├── scripts/
+│   └── build-firefox.js        # Firefox manifest generator (dist → dist-firefox)
 ├── vite.config.ts              # Vite config (popup + content + background builds)
 ├── tsconfig.json
 └── package.json
@@ -131,10 +134,14 @@ npm install
 ### Build for Production
 
 ```bash
+# Chrome & Edge
 npm run build
+
+# Firefox
+npm run build:firefox
 ```
 
-This builds the popup, content script, and background service worker into the `dist/` directory.
+This builds the popup, content script, and background service worker into the `dist/` directory (Chrome/Edge) or `dist-firefox/` (Firefox).
 
 ### Load in Chrome
 
@@ -152,6 +159,14 @@ This builds the popup, content script, and background service worker into the `d
 4. Select the `dist/` folder
 5. The extension works the same as in Chrome!
 
+### Load in Firefox
+
+1. Run `npm run build:firefox`
+2. Open `about:debugging#/runtime/this-firefox`
+3. Click **Load Temporary Add-on**
+4. Select `dist-firefox/manifest.json`
+5. Navigate to any website with images — the grid overlay will appear!
+
 ### Development
 
 ```bash
@@ -160,6 +175,13 @@ npm run build:popup
 
 # Build content script only
 npm run build:content
+
+# Build Firefox version
+npm run build:firefox
+
+# Create distribution zip files
+npm run zip            # Chrome/Edge zip
+npm run zip:firefox    # Firefox zip
 ```
 
 ## ⚙️ Settings
@@ -191,7 +213,7 @@ npm run build:content
 | `Alt+L` | Switch between solid and dashed lines |
 | `Alt+C` | Quick color toggle (swap both line and intersection dot colors between two presets) |
 
-You can customize these shortcuts at `chrome://extensions/shortcuts` or `edge://extensions/shortcuts`.
+You can customize these shortcuts at `chrome://extensions/shortcuts`, `edge://extensions/shortcuts`, or Firefox's `about:addons` → ⚙️ → Manage Extension Shortcuts.
 
 ## 🤝 Contributing
 
