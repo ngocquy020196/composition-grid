@@ -14,21 +14,18 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
-
-      # ── Build Chrome/Edge ──
       - name: Build Chrome/Edge
         run: npm run build
+
+      - name: Build Firefox
+        run: node scripts/build-firefox.js
 
       - name: Upload Chrome artifact
         uses: actions/upload-artifact@v4
@@ -37,10 +34,6 @@ jobs:
           path: dist/
           retention-days: 30
 
-      # ── Build Firefox ──
-      - name: Build Firefox
-        run: node scripts/build-firefox.js
-
       - name: Upload Firefox artifact
         uses: actions/upload-artifact@v4
         with:
@@ -48,24 +41,19 @@ jobs:
           path: dist-firefox/
           retention-days: 30
 
-      # ── Release (on tag push only) ──
-      - name: Package Chrome zip
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: cd dist && zip -r ../composition-grid-${{ github.ref_name }}.zip .
+      # ── Release & Deploy (tag only) ────────────────────────────────
 
-      - name: Package Firefox zip
+      - name: Package zips
         if: startsWith(github.ref, 'refs/tags/v')
-        run: cd dist-firefox && zip -r ../composition-grid-firefox-${{ github.ref_name }}.zip .
+        run: |
+          cd dist && zip -r ../composition-grid-${{ github.ref_name }}.zip .
+          cd ../dist-firefox && zip -r ../composition-grid-firefox-${{ github.ref_name }}.zip .
 
-      - name: Extract changelog for this version
+      - name: Extract changelog
         if: startsWith(github.ref, 'refs/tags/v')
-        id: changelog
         run: |
           VERSION="${{ github.ref_name }}"
-          # Extract content between this version header and the next --- separator
-          BODY=$(sed -n "/^## ${VERSION}/,/^---$/p" CHANGELOG.md | sed '1d;$d')
-          # Write to file for multi-line support
-          echo "$BODY" > release-notes.md
+          sed -n "/^## ${VERSION}/,/^---$/p" CHANGELOG.md | sed '1d;$d' > release-notes.md
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
@@ -76,3 +64,95 @@ jobs:
           files: |
             composition-grid-${{ github.ref_name }}.zip
             composition-grid-firefox-${{ github.ref_name }}.zip
+
+      # ── Chrome Web Store (API v2) ──────────────────────────────────
+
+      - name: Deploy to Chrome Web Store
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          EXT_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        run: |
+          API="https://chromewebstore.googleapis.com/v2/publishers/me/items/${EXT_ID}"
+          ZIP="composition-grid-${{ github.ref_name }}.zip"
+
+          TOKEN=$(curl -sf -X POST "https://oauth2.googleapis.com/token" \
+            -d "client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&refresh_token=${REFRESH_TOKEN}&grant_type=refresh_token" \
+            | jq -r '.access_token')
+          [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ] && { echo "::error::Chrome auth failed"; exit 1; }
+
+          curl -sf -X POST "${API}:upload" \
+            -H "Authorization: Bearer ${TOKEN}" -H "x-goog-api-version: 2" \
+            -H "Content-Type: application/zip" --data-binary "@${ZIP}" | jq .
+
+          curl -sf -X POST "${API}:publish" \
+            -H "Authorization: Bearer ${TOKEN}" -H "x-goog-api-version: 2" | jq .
+          echo "Chrome: submitted for review"
+
+      # ── Edge Add-ons (API v1.1) ────────────────────────────────────
+
+      - name: Deploy to Edge Add-ons
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+          CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          API_KEY: ${{ secrets.EDGE_API_KEY }}
+        run: |
+          API="https://api.addons.microsoftedge.microsoft.com/v1/products/${PRODUCT_ID}"
+          AUTH=(-H "Authorization: ApiKey ${API_KEY}" -H "X-ClientID: ${CLIENT_ID}")
+          ZIP="composition-grid-${{ github.ref_name }}.zip"
+
+          curl -sf -X POST "${API}/submissions/draft/package" \
+            "${AUTH[@]}" -H "Content-Type: application/zip" --data-binary "@${ZIP}"
+
+          for i in $(seq 1 12); do
+            sleep 10
+            STATUS=$(curl -sf "${API}/submissions/draft/package/operations" "${AUTH[@]}" \
+              | jq -r '.[0].status // empty')
+            [ "$STATUS" = "Succeeded" ] && break
+            [ "$STATUS" = "Failed" ] && { echo "::error::Edge processing failed"; exit 1; }
+          done
+
+          curl -sf -X POST "${API}/submissions" "${AUTH[@]}" -H "Content-Length: 0"
+          echo "Edge: submitted for certification"
+
+      # ── Firefox Add-ons (AMO API v5) ───────────────────────────────
+
+      - name: Deploy to Firefox Add-ons
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+          ADDON_ID: ${{ secrets.AMO_ADDON_ID }}
+        run: |
+          API="https://addons.mozilla.org/api/v5"
+          ZIP="composition-grid-firefox-${{ github.ref_name }}.zip"
+
+          gen_jwt() {
+            node -e "
+              const c=require('crypto'),
+                h=Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url'),
+                now=Math.floor(Date.now()/1000),
+                p=Buffer.from(JSON.stringify({iss:'${JWT_ISSUER}',jti:c.randomUUID(),iat:now,exp:now+300})).toString('base64url'),
+                s=c.createHmac('sha256','${JWT_SECRET}').update(h+'.'+p).digest('base64url');
+              console.log(h+'.'+p+'.'+s)"
+          }
+
+          UUID=$(curl -sf -X POST "${API}/addons/upload/" \
+            -H "Authorization: JWT $(gen_jwt)" \
+            -F "upload=@${ZIP}" -F "channel=listed" | jq -r '.uuid')
+          [ -z "$UUID" ] || [ "$UUID" = "null" ] && { echo "::error::Firefox upload failed"; exit 1; }
+
+          for i in $(seq 1 30); do
+            sleep 10
+            RESULT=$(curl -sf "${API}/addons/upload/${UUID}/" -H "Authorization: JWT $(gen_jwt)")
+            [ "$(echo "$RESULT" | jq -r '.processed')" = "true" ] && break
+          done
+          [ "$(echo "$RESULT" | jq -r '.valid')" != "true" ] && { echo "::error::Firefox validation failed"; exit 1; }
+
+          curl -sf -X POST "${API}/addons/addon/${ADDON_ID}/versions/" \
+            -H "Authorization: JWT $(gen_jwt)" -H "Content-Type: application/json" \
+            -d "{\"upload\":\"${UUID}\"}" | jq .
+          echo "Firefox: submitted for review"
