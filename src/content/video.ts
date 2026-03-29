@@ -17,6 +17,7 @@ interface VideoEntry {
     root: ReactDOM.Root;
     overlayDiv: HTMLDivElement;
     resizeObserver?: ResizeObserver;
+    originalParentPosition?: string;
 }
 
 const videoMap = new Map<HTMLVideoElement, VideoEntry>();
@@ -65,6 +66,10 @@ function cleanupVideo(video: HTMLVideoElement) {
         entry.root.unmount();
         entry.overlayDiv.remove();
         video.removeAttribute(ATTR);
+        // Restore parent's original position
+        if (entry.originalParentPosition !== undefined) {
+            entry.container.style.position = entry.originalParentPosition;
+        }
     } catch {
         // Node may already be removed from DOM
     }
@@ -98,6 +103,10 @@ function injectGrid(video: HTMLVideoElement) {
     if (!tabActive) return;
     if (!shouldInject(video)) return;
 
+    // Save parent's original position before createVideoOverlay modifies it
+    const parent = video.parentElement;
+    const originalParentPosition = parent ? parent.style.position : undefined;
+
     const overlayDiv = createVideoOverlay(video);
     if (!overlayDiv) return;
 
@@ -113,7 +122,7 @@ function injectGrid(video: HTMLVideoElement) {
     resizeObserver.observe(video);
 
     const root = ReactDOM.createRoot(overlayDiv);
-    const entry: VideoEntry = { video, container: video.parentElement!, root, overlayDiv, resizeObserver };
+    const entry: VideoEntry = { video, container: video.parentElement!, root, overlayDiv, resizeObserver, originalParentPosition };
 
     videoMap.set(video, entry);
     renderOverlay(entry);

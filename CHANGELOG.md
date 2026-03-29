@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.0.6 — 2026-03-29
+
+### 🐛 Bug Fixes
+
+- **Conditional overlay injection** — CSS and grid elements are now only injected when the respective overlay (Image/Video) is actually enabled. Previously, overlays were created and hidden via `display:none` even when disabled.
+- **Parent style restoration** — `isolation: isolate` and `position: relative` are now properly restored to their original values when overlays are removed. Previously, these styles were left behind after disabling the extension.
+- **Independent context menu** — Right-click grid toggle no longer changes the global `enabled` state. It works independently per image regardless of the Image Overlay toggle, and is temporary (cleared on page reload).
+
+### 🔧 Improvements
+
+- **Smarter re-enable** — When toggling Image Overlay back on, images are re-scanned only on the OFF→ON transition, not on every settings change (e.g. color, line size).
+- **Context-menu grids persist** — Grids added via right-click are preserved even when the global Image Overlay is toggled off. Only auto-injected grids are removed.
+- **Cleaner DOM** — Disabling the extension now fully removes all injected DOM elements, React roots, ResizeObservers, and restores parent element styles — zero leftover artifacts.
+
+---
+
 ## v1.0.5 — 2026-03-24
 
 ### ✨ New Features

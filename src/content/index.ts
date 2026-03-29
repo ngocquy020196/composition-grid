@@ -19,14 +19,18 @@ interface InjectedEntry {
     root: ReactDOM.Root;
     overlayDiv: HTMLDivElement;
     resizeObserver?: ResizeObserver;
+    originalParentStyles?: { position: string; isolation: string };
 }
 
 const injectedMap = new Map<HTMLImageElement, InjectedEntry>();
+// Track images injected via context menu — these work independently of `enabled` state
+const contextMenuImages = new Set<HTMLImageElement>();
 
 // ─── Rendering ───────────────────────────────────────────────────────────────
 function renderOverlay(entry: InjectedEntry) {
     const { settings } = getState();
-    if (!settings.enabled) {
+    // Context-menu images always show regardless of enabled state
+    if (!settings.enabled && !contextMenuImages.has(entry.img)) {
         entry.overlayDiv.style.display = 'none';
         entry.resizeObserver?.disconnect();
         return;
@@ -36,8 +40,28 @@ function renderOverlay(entry: InjectedEntry) {
     renderGridElement(entry.root, settings);
 }
 
+let prevEnabled = false; // tracks previous enabled state for OFF→ON detection
+
 function renderAllOverlays() {
+    const { settings } = getState();
+    const justEnabled = settings.enabled && !prevEnabled;
+    prevEnabled = settings.enabled;
+
+    if (!settings.enabled) {
+        // Remove auto-injected overlays, but keep context-menu ones
+        injectedMap.forEach((entry, img) => {
+            if (contextMenuImages.has(img)) {
+                renderOverlay(entry);
+            } else {
+                cleanupImage(img);
+            }
+        });
+        return;
+    }
+    // Re-render existing overlays
     injectedMap.forEach((entry) => renderOverlay(entry));
+    // Only rescan when just re-enabled (OFF→ON), not on every settings change
+    if (justEnabled) rescanImages();
 }
 
 // Register with shared event system
@@ -60,16 +84,23 @@ function cleanupImage(img: HTMLImageElement) {
         entry.root.unmount();
         entry.overlayDiv.remove();
         img.removeAttribute(ATTR);
+        // Restore parent's original styles
+        if (entry.originalParentStyles) {
+            entry.container.style.position = entry.originalParentStyles.position;
+            entry.container.style.isolation = entry.originalParentStyles.isolation;
+        }
     } catch {
         // Node may already be removed from DOM
     }
     injectedMap.delete(img);
+    contextMenuImages.delete(img);
 }
 
 // ─── Injection ───────────────────────────────────────────────────────────────
 function shouldInject(img: HTMLImageElement): boolean {
     if (img.getAttribute(ATTR) === 'true') return false;
     const { settings } = getState();
+    if (!settings.enabled) return false;
     const minSize = settings.minImageSize;
 
     // Cheap size check first — filters out most images before expensive calls
@@ -116,10 +147,18 @@ function syncOverlayPosition(img: HTMLImageElement, overlayDiv: HTMLDivElement) 
     overlayDiv.style.height = `${bounds.height}px`;
 }
 
-function injectGrid(img: HTMLImageElement) {
+function injectGrid(img: HTMLImageElement, force = false) {
     const { tabActive } = getState();
     if (!tabActive) return;
-    if (!shouldInject(img)) return;
+    if (!force && !shouldInject(img)) return;
+    if (img.getAttribute(ATTR) === 'true') return;
+
+    // Save parent's original styles before createImageOverlay modifies them
+    const parent = img.parentElement;
+    const originalParentStyles = parent ? {
+        position: parent.style.position,
+        isolation: parent.style.isolation,
+    } : undefined;
 
     const overlayDiv = createImageOverlay(img);
     if (!overlayDiv) return;
@@ -138,7 +177,7 @@ function injectGrid(img: HTMLImageElement) {
     resizeObserver.observe(img);
 
     const root = ReactDOM.createRoot(overlayDiv);
-    const entry: InjectedEntry = { img, container: img.parentElement!, root, overlayDiv, resizeObserver };
+    const entry: InjectedEntry = { img, container: img.parentElement!, root, overlayDiv, resizeObserver, originalParentStyles };
 
     injectedMap.set(img, entry);
     renderOverlay(entry);
@@ -279,23 +318,14 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
     {
         const img = targetImg;
         const entry = injectedMap.get(img);
-        const { settings } = getState();
 
         if (entry) {
-            const isHidden = !settings.enabled;
-            if (isHidden) {
-                // Grid was injected but hidden → enable and show
-                chrome.storage.sync.set({ enabled: true });
-            } else {
-                // Grid is visible → remove it
-                cleanupImage(img);
-            }
+            // Grid exists → remove it
+            cleanupImage(img);
         } else {
-            // Not injected yet → enable and inject
-            if (!settings.enabled) {
-                chrome.storage.sync.set({ enabled: true });
-            }
-            injectGrid(img);
+            // No grid → inject independently (works regardless of enabled state)
+            contextMenuImages.add(img);
+            injectGrid(img, true);
         }
     }
 });
@@ -304,6 +334,9 @@ chrome.runtime.onMessage.addListener((message: { type: string; srcUrl?: string }
 async function init() {
     const allowed = await initShared();
     if (!allowed) return;
+
+    // Sync prevEnabled with initial settings
+    prevEnabled = getState().settings.enabled;
 
     // Process existing images via IntersectionObserver
     const existingImages = document.querySelectorAll<HTMLImageElement>('img');
