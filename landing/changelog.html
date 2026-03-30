@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Changelog - Composition Grid</title>
+    <meta name="description"
+        content="View the full changelog and release history of Composition Grid browser extension." />
+    <link rel="icon" type="image/png" href="images/icon128.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* ===== Changelog Specific ===== */
+        .changelog-page {
+            padding: 120px 0 80px;
+            min-height: 100vh;
+        }
+
+        .changelog-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .changelog-header h1 {
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .changelog-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .changelog-loading {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 60px 0;
+            font-size: 14px;
+        }
+
+        .changelog-loading .spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .changelog-content {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        /* Version block */
+        .version-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+
+        .version-block:hover {
+            border-color: var(--border-hover);
+        }
+
+        .version-block:first-child {
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.04);
+        }
+
+        .version-block:first-child:hover {
+            border-color: rgba(167, 139, 250, 0.5);
+        }
+
+        .version-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .version-tag {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .version-block:first-child .version-tag {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .version-date {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .version-badge {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+            background: var(--accent-gradient);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .version-section h3 {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-purple);
+            margin-bottom: 10px;
+        }
+
+        .version-section {
+            margin-bottom: 16px;
+        }
+
+        .version-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .version-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .version-section li {
+            position: relative;
+            padding: 6px 0 6px 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .version-section li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 14px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            opacity: 0.6;
+        }
+
+        .version-section li strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .version-section li code {
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-purple);
+        }
+
+        .changelog-error {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 60px 0;
+        }
+
+        .changelog-error a {
+            color: var(--accent-purple);
+        }
+
+        @media (max-width: 640px) {
+            .version-block {
+                padding: 20px;
+            }
+
+            .version-title {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <img src="images/icon128.png" alt="Composition Grid" width="32" height="32" />
+                <span>Composition Grid</span>
+            </a>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/#screenshots">Screenshots</a>
+                <a href="/changelog.html" style="color: var(--accent-purple);">Changelog</a>
+                <a href="https://github.com/ngocquy020196/Composition-Grid" target="_blank" rel="noopener"
+                    class="nav-github">
+                    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+                        </path>
+                    </svg>
+                    <span id="navStarCount">–</span>
+                </a>
+                <a href="/#install" class="nav-cta">Install Free</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Changelog -->
+    <section class="changelog-page">
+        <div class="container">
+            <div class="changelog-header">
+                <h1>Changelog</h1>
+                <p>Release history and version updates</p>
+            </div>
+
+            <div id="changelogContent" class="changelog-content">
+                <div class="changelog-loading">
+                    <div class="spinner"></div>
+                    Loading changelog...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="images/icon128.png" alt="Composition Grid" width="28" height="28" />
+                    <span>Composition Grid</span>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/ngocquy020196/composition-grid" target="_blank"
+                        rel="noopener">GitHub</a>
+                    <a href="/PRIVACY_POLICY.html" rel="noopener">Privacy</a>
+                    <a href="/changelog.html">Changelog</a>
+                    <a href="https://ngocquy.dev" target="_blank" rel="noopener">Author</a>
+                    <a href="https://buymeacoffee.com/ngocquy.dev" target="_blank" rel="noopener">Buy Me a Coffee</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Powered by <a href="https://ngocquy.dev" target="_blank" rel="noopener">Quy Nguyen</a>.
+                    Version <span id="appVersion">x.x.x</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Nav scroll effect
+        const nav = document.querySelector('.nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('nav-scrolled', window.scrollY > 50);
+        });
+
+        // Fetch GitHub star count
+        fetch('https://api.github.com/repos/ngocquy020196/Composition-Grid')
+            .then(r => r.json())
+            .then(data => {
+                if (data.stargazers_count !== undefined) {
+                    document.getElementById('navStarCount').textContent = data.stargazers_count;
+                }
+            })
+            .catch(() => { });
+
+        // Fetch latest version
+        fetch('https://api.github.com/repos/ngocquy020196/Composition-Grid/tags?per_page=1')
+            .then(r => r.json())
+            .then(tags => {
+                if (tags.length && tags[0].name) {
+                    document.getElementById('appVersion').textContent = tags[0].name.replace('v', '');
+                }
+            })
+            .catch(() => { });
+
+        // Fetch & parse CHANGELOG.md from GitHub
+        fetch('https://raw.githubusercontent.com/ngocquy020196/Composition-Grid/main/CHANGELOG.md')
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to fetch');
+                return r.text();
+            })
+            .then(md => {
+                const container = document.getElementById('changelogContent');
+                container.innerHTML = parseChangelog(md);
+            })
+            .catch(() => {
+                document.getElementById('changelogContent').innerHTML =
+                    '<div class="changelog-error"><p>Failed to load changelog.</p><p><a href="https://github.com/ngocquy020196/Composition-Grid/blob/main/CHANGELOG.md" target="_blank">View on GitHub</a></p></div>';
+            });
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function formatContent(raw) {
+            // Escape HTML first, then apply markdown formatting
+            let s = escapeHtml(raw);
+            s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            s = s.replace(/`(.+?)`/g, '<code>$1</code>');
+            return s;
+        }
+
+        function parseChangelog(md) {
+            const lines = md.split('\n');
+            let html = '';
+            let inVersion = false;
+            let isFirst = true;
+            let sectionOpen = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                // Version heading: ## v1.0.7 — 2026-03-30
+                const versionMatch = line.match(/^## (v[\d.]+)\s*[—–-]\s*(.+)/);
+                if (versionMatch) {
+                    if (sectionOpen) html += '</ul></div>';
+                    if (inVersion) html += '</div>';
+                    sectionOpen = false;
+
+                    const tag = versionMatch[1];
+                    const date = versionMatch[2].trim();
+                    const badge = isFirst ? '<span class="version-badge">Latest</span>' : '';
+
+                    html += `<div class="version-block">`;
+                    html += `<div class="version-title">`;
+                    html += `<span class="version-tag">${tag}</span>`;
+                    html += `<span class="version-date">${date}</span>`;
+                    html += badge;
+                    html += `</div>`;
+
+                    inVersion = true;
+                    isFirst = false;
+                    continue;
+                }
+
+                // Section heading: ### New Features
+                const sectionMatch = line.match(/^### (.+)/);
+                if (sectionMatch && inVersion) {
+                    if (sectionOpen) html += '</ul></div>';
+                    html += `<div class="version-section"><h3>${escapeHtml(sectionMatch[1])}</h3><ul>`;
+                    sectionOpen = true;
+                    continue;
+                }
+
+                // List item: - **Bold** — Description
+                const itemMatch = line.match(/^- (.+)/);
+                if (itemMatch && sectionOpen) {
+                    html += `<li>${formatContent(itemMatch[1])}</li>`;
+                    continue;
+                }
+
+                // Indented sub-item:   - Sub description
+                const subMatch = line.match(/^\s+- (.+)/);
+                if (subMatch && sectionOpen) {
+                    html += `<li style="padding-left:32px;opacity:0.85">${formatContent(subMatch[1])}</li>`;
+                    continue;
+                }
+
+                // Horizontal rule / title — skip
+                if (line.match(/^---/) || line.match(/^# Changelog/)) continue;
+            }
+
+            if (sectionOpen) html += '</ul></div>';
+            if (inVersion) html += '</div>';
+
+            return html || '<div class="changelog-error"><p>No changelog entries found.</p></div>';
+        }
+    </script>
+</body>
+
+</html>
