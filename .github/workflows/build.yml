@@ -22,6 +22,17 @@ jobs:
           cache: npm
       - run: npm ci
 
+      - name: Sync manifest version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('public/manifest.json','utf8'));
+            m.version = '${VERSION}';
+            fs.writeFileSync('public/manifest.json', JSON.stringify(m, null, 4) + '\n');
+          "
+          echo "Manifest version synced to ${VERSION}"
+
       - name: Build Chrome/Edge
         run: npm run build
 
