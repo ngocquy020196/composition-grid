@@ -2,11 +2,11 @@
 
 **Composition Grid: Rule of Thirds, Golden Ratio & More**
 
-*Last updated: March 22, 2026*
+*Last updated: March 30, 2026*
 
 ## Overview
 
-Composition Grid is a browser extension for Chrome and Microsoft Edge that overlays composition grids (Rule of Thirds, Golden Ratio, Fibonacci Spiral, and Golden Triangle) on images across the web. We are committed to protecting your privacy.
+Composition Grid is a browser extension for Chrome and Microsoft Edge that overlays composition grids (Rule of Thirds, Golden Ratio, Fibonacci Spiral, and Golden Triangle) on images and video across the web. We are committed to protecting your privacy.
 
 ## Data Collection
 
@@ -14,14 +14,14 @@ Composition Grid is a browser extension for Chrome and Microsoft Edge that overl
 
 This extension:
 
-- ✅ Stores your settings (grid types, colors, sizes, language, site filter lists) locally using the browser's `storage.sync` API
-- ✅ Reads the active tab's URL **locally** to show/hide the context menu based on your site filter settings
-- ✅ Runs entirely on your device
-- ❌ Does **not** collect browsing history
-- ❌ Does **not** collect personal information
-- ❌ Does **not** track user behavior
-- ❌ Does **not** send data to any external servers
-- ❌ Does **not** use cookies or analytics
+- Stores your settings (grid types, colors, sizes, language, site filter lists) locally using the browser's `storage.sync` API
+- Reads the active tab's URL **locally** to show/hide the context menu based on your site filter settings
+- Runs entirely on your device
+- Does **not** collect browsing history
+- Does **not** collect personal information
+- Does **not** track user behavior
+- Does **not** send data to any external servers
+- Does **not** use cookies or analytics
 
 ## Permissions
 
@@ -44,5 +44,5 @@ If we update this privacy policy, the changes will be posted in this document wi
 
 If you have any questions about this privacy policy, please contact:
 
-- 🌐 Website: [ngocquy.dev](https://ngocquy.dev)
-- 📧 Email: [contact@ngocquy.dev](mailto:contact@ngocquy.dev)
+- Website: [ngocquy.dev](https://ngocquy.dev)
+- Email: [contact@ngocquy.dev](mailto:contact@ngocquy.dev)
