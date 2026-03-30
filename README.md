@@ -23,7 +23,7 @@
 
 ---
 
-A lightweight Chrome, Edge & Firefox extension that overlays **Rule of Thirds**, **Golden Ratio**, **Fibonacci Spiral**, and **Golden Triangle** composition grids directly onto images on any website. Perfect for photographers, designers, and visual artists who want to analyze compositional balance without leaving the browser.
+A lightweight Chrome, Edge & Firefox extension that overlays **Rule of Thirds**, **Golden Ratio**, **Fibonacci Spiral**, and **Golden Triangle** composition grids directly onto images and video on any website. Perfect for photographers, designers, and visual artists who want to analyze compositional balance without leaving the browser.
 
 ## Features
 
