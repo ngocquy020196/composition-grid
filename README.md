@@ -233,10 +233,10 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 **Quy Nguyen**
 
-- 🌐 Website: [ngocquy.dev](https://ngocquy.dev)
+- 🌐 Website: [ngocquy.dev](https://ngocquy.dev/?ref=github-composition-grid)
 - 📧 Email: [contact@ngocquy.dev](mailto:contact@ngocquy.dev)
 
-<a href="https://buymeacoffee.com/ngocquy.dev" target="_blank">
+<a href="https://buymeacoffee.com/ngocquy.dev/?ref=github-composition-grid" target="_blank">
   <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" >
 </a>
 
