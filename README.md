@@ -25,23 +25,23 @@
 
 A lightweight Chrome, Edge & Firefox extension that overlays **Rule of Thirds**, **Golden Ratio**, **Fibonacci Spiral**, and **Golden Triangle** composition grids directly onto images on any website. Perfect for photographers, designers, and visual artists who want to analyze compositional balance without leaving the browser.
 
-## ✨ Features
+## Features
 
-- 📐 **Four Grid Types** — Rule of Thirds, Golden Ratio, Fibonacci Spiral & Golden Triangle
-- 🎬 **Video Overlay** — Composition grid on `<video>` elements (independent toggle)
-- 🔴 **Intersection Dots** — Highlight power points with toggleable dots
-- 🎨 **Custom Colors** — Pick any color for grid lines and dots
-- ⌨️ **Keyboard Shortcuts** — `Alt+I` image overlay, `Alt+V` video overlay, `Alt+L` line style, `Alt+C` quick color
-- 🎯 **Quick Color Toggle** — Swap grid color between two customizable presets with a Shortcut
-- 🖱️ **Context Menu** — Right-click any image to toggle the grid overlay
-- 🌐 **Site Mode** — All Sites / Block List / Allow List — control where the grid appears
-- 🌗 **Dark / Light Theme** — Switch between dark and light interface
-- ⚙️ **Options Page** — Dedicated settings page with site management
-- 🌍 **Bilingual** — English & Vietnamese (Tiếng Việt)
-- ⚡ **High Performance** — Uses IntersectionObserver & MutationObserver for efficient image detection
-- 🧩 **Manifest V3** — Built with the latest Chrome, Edge & Firefox extension standard
+- **Four Grid Types** — Rule of Thirds, Golden Ratio, Fibonacci Spiral & Golden Triangle
+- **Video Overlay** — Composition grid on `<video>` elements (independent toggle)
+- **Intersection Dots** — Highlight power points with toggleable dots
+- **Custom Colors** — Pick any color for grid lines and dots
+- **Keyboard Shortcuts** — `Alt+I` image overlay, `Alt+V` video overlay, `Alt+L` line style, `Alt+C` quick color
+- **Quick Color Toggle** — Swap grid color between two customizable presets with a Shortcut
+- **Context Menu** — Right-click any image to toggle the grid overlay
+- **Site Mode** — All Sites / Block List / Allow List — control where the grid appears
+- **Dark / Light Theme** — Switch between dark and light interface
+- **Options Page** — Dedicated settings page with site management
+- **Bilingual** — English & Vietnamese (Tiếng Việt)
+- **High Performance** — Uses IntersectionObserver & MutationObserver for efficient image detection
+- **Manifest V3** — Built with the latest Chrome, Edge & Firefox extension standard
 
-## 📸 How It Works
+## How It Works
 
 1. Install the extension
 2. Navigate to any page with images
@@ -58,7 +58,7 @@ A lightweight Chrome, Edge & Firefox extension that overlays **Rule of Thirds**,
    - Customize line and dot colors & sizes
    - Switch language (EN / VI)
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Technology | Purpose |
 |---|---|
@@ -67,7 +67,7 @@ A lightweight Chrome, Edge & Firefox extension that overlays **Rule of Thirds**,
 | **TypeScript** | Type-safe codebase |
 | **Manifest V3** | Chrome, Edge & Firefox extension platform |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 composition-grid/
@@ -118,7 +118,7 @@ composition-grid/
 └── package.json
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -184,15 +184,15 @@ npm run zip            # Chrome/Edge zip
 npm run zip:firefox    # Firefox zip
 ```
 
-## ⚙️ Settings
+## Settings
 
 | Setting | Description | Default |
 |---|---|---|
-| Image Overlay | Toggle image grid on/off | ✅ On |
-| Video Overlay | Toggle video grid on/off | ❌ Off |
-| Show Dots | Toggle intersection point dots | ✅ On |
+| Image Overlay | Toggle image grid on/off | On |
+| Video Overlay | Toggle video grid on/off | Off |
+| Show Dots | Toggle intersection point dots | On |
 | Grid Type | Rule of Thirds, Golden Ratio, Fibonacci Spiral, Triangle (multi-select) | Rule of Thirds, Triangle |
-| Spiral Direction | Fibonacci spiral orientation (↱ ↲ ↳ ↰) | ↱ Top-Left |
+| Spiral Direction | Fibonacci spiral orientation | Top-Left |
 | Line Color | Color of grid lines | `#ffffff` |
 | Dot Color | Color of intersection dots | `#ffffff` |
 | Dot Size | Size of intersection dots (2–20px) | `8px` |
@@ -201,10 +201,10 @@ npm run zip:firefox    # Firefox zip
 | Skip Small Images | Minimum image size to show grid (50–500px) | `200px` |
 | Site Mode | All Sites / Block List / Allow List | All Sites |
 | Theme | Dark or Light interface | Dark |
-| Quick Color | Two preset colors for quick toggle (`Alt+C`) | `#ffffff` ↔ `#000000` |
+| Quick Color | Two preset colors for quick toggle (`Alt+C`) | `#ffffff` / `#000000` |
 | Language | English or Vietnamese | English |
 
-## ⌨️ Keyboard Shortcuts
+## Keyboard Shortcuts
 
 | Shortcut | Action |
 |---|---|
@@ -213,9 +213,9 @@ npm run zip:firefox    # Firefox zip
 | `Alt+L` | Switch between solid and dashed lines |
 | `Alt+C` | Quick color toggle (swap both line and intersection dot colors between two presets) |
 
-You can customize these shortcuts at `chrome://extensions/shortcuts`, `edge://extensions/shortcuts`, or Firefox's `about:addons` → ⚙️ → Manage Extension Shortcuts.
+You can customize these shortcuts at `chrome://extensions/shortcuts`, `edge://extensions/shortcuts`, or Firefox's `about:addons` → Manage Extension Shortcuts.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Feel free to:
 
@@ -225,16 +225,16 @@ Contributions are welcome! Feel free to:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
-## 👤 Author
+## Author
 
 **Quy Nguyen**
 
-- 🌐 Website: [ngocquy.dev](https://ngocquy.dev/?ref=github-composition-grid)
-- 📧 Email: [contact@ngocquy.dev](mailto:contact@ngocquy.dev)
+- Website: [ngocquy.dev](https://ngocquy.dev/?ref=github-composition-grid)
+- Email: [contact@ngocquy.dev](mailto:contact@ngocquy.dev)
 
 <a href="https://buymeacoffee.com/ngocquy.dev/?ref=github-composition-grid" target="_blank">
   <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" >
