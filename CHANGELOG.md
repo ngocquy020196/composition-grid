@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.0.7 — 2026-03-30
+
+### New Features
+
+- **File URL support notice** — Popup shows a helpful notice when extension is opened on `file://` pages without file access permission, with a direct link to settings.
+- **Donate notice** — Dismissable "Buy Me a Coffee" card with 24h cooldown in popup footer.
+
+### Improvements
+
+- **Icon consistency** — Popup logo now uses the original SVG icon, preserving colors across both dark and light themes.
+- **Footer readability** — Improved text visibility in popup footer and hint labels.
+- **Updated description** — Manifest description now includes "video" alongside images.
+
+---
+
 ## v1.0.6 — 2026-03-29
 
 ### Bug Fixes

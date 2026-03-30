@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GridType, LineStyle, SpiralOrientation, Theme } from '../types';
 import { useSettings } from '../hooks/useSettings';
 import { t } from '../i18n';
@@ -6,11 +6,34 @@ import { t } from '../i18n';
 const App: React.FC = () => {
     const { settings, loaded, update, reset } = useSettings();
     const lang = settings.language;
+    const [fileAccessWarning, setFileAccessWarning] = useState(false);
+    const [showDonate, setShowDonate] = useState(false);
 
     // Apply theme to document root
     useEffect(() => {
         document.documentElement.dataset.theme = settings.theme;
     }, [settings.theme]);
+
+    // Check if current tab is file:// and extension lacks file access
+    useEffect(() => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.url?.startsWith('file://')) {
+                chrome.extension.isAllowedFileSchemeAccess((allowed) => {
+                    if (!allowed) setFileAccessWarning(true);
+                });
+            }
+        });
+    }, []);
+
+    // Check donate dismiss (24h cooldown)
+    useEffect(() => {
+        chrome.storage.local.get('donateDismissedAt', (result) => {
+            const dismissed = result.donateDismissedAt as number | undefined;
+            if (!dismissed || Date.now() - dismissed > 24 * 60 * 60 * 1000) {
+                setShowDonate(true);
+            }
+        });
+    }, []);
 
     if (!loaded) return null;
 
@@ -19,29 +42,23 @@ const App: React.FC = () => {
             {/* Header */}
             <header className="popup-header">
                 <div className="header-icon">
-                    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="1" y="1" width="34" height="34" rx="8" stroke="url(#grad)" strokeWidth="2" />
-                        <line x1="12.33" y1="1" x2="12.33" y2="35" stroke="url(#grad)" strokeWidth="1.2" opacity="0.6" />
-                        <line x1="23.67" y1="1" x2="23.67" y2="35" stroke="url(#grad)" strokeWidth="1.2" opacity="0.6" />
-                        <line x1="1" y1="12.33" x2="35" y2="12.33" stroke="url(#grad)" strokeWidth="1.2" opacity="0.6" />
-                        <line x1="1" y1="23.67" x2="35" y2="23.67" stroke="url(#grad)" strokeWidth="1.2" opacity="0.6" />
-                        <circle cx="12.33" cy="12.33" r="2" fill="#fbbf24" />
-                        <circle cx="23.67" cy="12.33" r="2" fill="#fbbf24" />
-                        <circle cx="12.33" cy="23.67" r="2" fill="#fbbf24" />
-                        <circle cx="23.67" cy="23.67" r="2" fill="#fbbf24" />
-                        <defs>
-                            <linearGradient id="grad" x1="0" y1="0" x2="36" y2="36">
-                                <stop offset="0%" stopColor="#a78bfa" />
-                                <stop offset="100%" stopColor="#ec4899" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                    <img src={chrome.runtime.getURL('icons/icon128.svg')} alt="logo" width="36" height="36" />
                 </div>
                 <div className="header-text">
                     <h1>{t('appName', lang)}</h1>
                     <p>{t('appTagline', lang)}</p>
                 </div>
             </header>
+
+            {/* File access warning */}
+            {fileAccessWarning && (
+                <div className="file-access-notice">
+                    <p>{t('fileAccessNotice', lang)}</p>
+                    <button onClick={() => {
+                        chrome.tabs.create({ url: 'chrome://extensions/?id=' + chrome.runtime.id });
+                    }}>{t('fileAccessAction', lang)}</button>
+                </div>
+            )}
 
             {/* Image Overlay toggle */}
             <div className="setting-row toggle-row">
@@ -343,6 +360,21 @@ const App: React.FC = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Donate notice — dismissable for 24h */}
+            {showDonate && (
+                <div className="donate-notice">
+                    <button className="donate-close" onClick={() => {
+                        setShowDonate(false);
+                        chrome.storage.local.set({ donateDismissedAt: Date.now() });
+                    }} aria-label="Close">&times;</button>
+                    <p>{t('donateMessage', lang)}</p>
+                    <a href="https://buymeacoffee.com/ngocquy.dev" target="_blank" rel="noopener noreferrer">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        {t('buyMeCoffee', lang)}
+                    </a>
+                </div>
+            )}
 
             {/* Footer */}
             <footer className="popup-footer">

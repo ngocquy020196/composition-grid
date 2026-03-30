@@ -177,6 +177,22 @@ const translations = {
         en: 'Applied to lines & dots',
         vi: 'Áp dụng cho cả đường kẻ và chấm',
     },
+    fileAccessNotice: {
+        en: 'Enable "Allow access to file URLs" in extension settings to use on local files.',
+        vi: 'Bật "Cho phép truy cập URL tệp" trong cài đặt extension để dùng trên file cục bộ.',
+    },
+    fileAccessAction: {
+        en: 'Open Settings',
+        vi: 'Mở Cài Đặt',
+    },
+    buyMeCoffee: {
+        en: 'Buy Me a Coffee',
+        vi: 'Mời Tác Giả Cà Phê',
+    },
+    donateMessage: {
+        en: 'Enjoying this extension? Support its development!',
+        vi: 'Thích extension này? Hãy ủng hộ tác giả!',
+    },
 } as const satisfies Record<string, Record<Language, string>>;
 
 export type TranslationKey = keyof typeof translations;
