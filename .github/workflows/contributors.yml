@@ -1,0 +1,25 @@
+name: Update Contributors
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday
+
+jobs:
+  contributors:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update contributor list
+        uses: contrib-readme-action/contrib-readme-action@v1
+        with:
+          readme_path: CONTRIBUTORS.md
+          columns_per_row: 6
+          image_size: 100
+          commit_message: 'docs: update contributors [skip ci]'
+        env:
+          CONTRIB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
